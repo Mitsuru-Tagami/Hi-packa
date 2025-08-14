@@ -115,6 +115,10 @@ const renderCardList = () => {
   runModeBtn.textContent = isRunMode ? t('editMode') : t('runMode');
   runModeBtn.onclick = () => { isRunMode = !isRunMode; renderAll(); };
 
+  const exportHtmlBtn = document.createElement('button');
+  exportHtmlBtn.textContent = t('exportHtml');
+  exportHtmlBtn.onclick = exportToHtml;
+
   const enBtn = document.createElement('button');
   enBtn.textContent = 'English';
   enBtn.onclick = () => { i18next.changeLanguage('en').then(renderAll); };
@@ -124,6 +128,7 @@ const renderCardList = () => {
 
   footer.appendChild(settingsBtn);
   footer.appendChild(runModeBtn);
+  footer.appendChild(exportHtmlBtn);
   footer.appendChild(enBtn);
   footer.appendChild(jaBtn);
   cardListPanel.appendChild(footer);

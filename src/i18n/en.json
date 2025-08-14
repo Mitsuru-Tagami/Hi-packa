@@ -35,6 +35,7 @@
     "aiHelperLink": "https://gemini.google.com/app",
     "aiHelperText": "Ask AI for script ideas",
     "runMode": "Run",
-    "editMode": "Edit"
+    "editMode": "Edit",
+    "exportHtml": "Export HTML"
   }
 }
