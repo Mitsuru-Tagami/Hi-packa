@@ -3,7 +3,7 @@
     "cardProperties": "カードのプロパティ",
     "cardName": "カード名",
     "deleteCard": "カードを削除",
-    "deleteCardConfirmation": "カード「{{cardName}}」を削除します。\nこの操作は取り消しできません。よろしいですか？",
+    "deleteCardConfirmation": "カード\"{{cardName}}\"を削除します。\nこの操作は取り消しできません。よろしいですか？",
     "lastCardWarning": "これは最後のカードなので、削除できません。",
     "objectProperties": "プロパティ: {{type}}",
     "noObjectSelected": "オブジェクトが選択されていません。",
@@ -33,6 +33,8 @@
     "enterMagicWord": "魔法の言葉を入力:",
     "magicEnabled": "Magicが有効になりました！",
     "aiHelperLink": "https://gemini.google.com/app",
-    "aiHelperText": "AIにスクリプトのアイデアを聞く"
+    "aiHelperText": "AIにスクリプトのアイデアを聞く",
+    "runMode": "実行",
+    "editMode": "編集"
   }
 }

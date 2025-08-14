@@ -33,6 +33,8 @@
     "enterMagicWord": "Enter Magic Word:",
     "magicEnabled": "Magic is enabled!",
     "aiHelperLink": "https://gemini.google.com/app",
-    "aiHelperText": "Ask AI for script ideas"
+    "aiHelperText": "Ask AI for script ideas",
+    "runMode": "Run",
+    "editMode": "Edit"
   }
 }

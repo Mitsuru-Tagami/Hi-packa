@@ -43,6 +43,8 @@ type Stack = {
 
 // --- アプリケーションの状態 ---
 let isMagicEnabled = false;
+let isRunMode = false;
+
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const cardListPanel = document.createElement('div');
 cardListPanel.id = 'card-list-panel';
@@ -71,6 +73,7 @@ const getCurrentCard = (): Card | undefined => stack.cards.find(c => c.id === st
 
 // --- レンダリング ---
 const renderAll = () => {
+  document.body.classList.toggle('run-mode-active', isRunMode);
   renderCardList();
   renderCanvas();
   updatePropertiesPanel(selectedObject);
@@ -78,37 +81,49 @@ const renderAll = () => {
 
 const renderCardList = () => {
   cardListPanel.innerHTML = '';
-  const container = document.createElement('div');
-  container.id = 'card-list-container';
-  stack.cards.forEach((card, index) => {
-    const item = document.createElement('div');
-    item.className = 'card-list-item';
-    item.textContent = `${index + 1}. ${card.name}`;
-    if (card.id === stack.currentCardId) item.classList.add('is-active');
-    item.addEventListener('click', () => switchCard(card.id));
-    container.appendChild(item);
-  });
-  cardListPanel.appendChild(container);
 
-  const addBtn = document.createElement('button');
-  addBtn.id = 'add-card-btn';
-  addBtn.textContent = t('addNewCard');
-  addBtn.addEventListener('click', addNewCard);
-  cardListPanel.appendChild(addBtn);
+  // Render card list items and add button only in edit mode
+  if (!isRunMode) {
+    const container = document.createElement('div');
+    container.id = 'card-list-container';
+    stack.cards.forEach((card, index) => {
+      const item = document.createElement('div');
+      item.className = 'card-list-item';
+      item.textContent = `${index + 1}. ${card.name}`;
+      if (card.id === stack.currentCardId) item.classList.add('is-active');
+      item.addEventListener('click', () => switchCard(card.id));
+      container.appendChild(item);
+    });
+    cardListPanel.appendChild(container);
 
-  // Footer Controls
+    const addBtn = document.createElement('button');
+    addBtn.id = 'add-card-btn';
+    addBtn.textContent = t('addNewCard');
+    addBtn.addEventListener('click', addNewCard);
+    cardListPanel.appendChild(addBtn);
+  }
+
+  // Footer Controls (always visible)
   const footer = document.createElement('div');
   footer.id = 'footer-controls';
+
   const settingsBtn = document.createElement('button');
   settingsBtn.textContent = t('settings');
   settingsBtn.onclick = () => { document.querySelector('.modal-overlay')!.style.display = 'flex'; };
+
+  const runModeBtn = document.createElement('button');
+  runModeBtn.textContent = isRunMode ? t('editMode') : t('runMode');
+  runModeBtn.onclick = () => { isRunMode = !isRunMode; renderAll(); };
+
   const enBtn = document.createElement('button');
   enBtn.textContent = 'English';
   enBtn.onclick = () => { i18next.changeLanguage('en').then(renderAll); };
   const jaBtn = document.createElement('button');
   jaBtn.textContent = '日本語';
   jaBtn.onclick = () => { i18next.changeLanguage('ja').then(renderAll); };
+
   footer.appendChild(settingsBtn);
+  footer.appendChild(runModeBtn);
   footer.appendChild(enBtn);
   footer.appendChild(jaBtn);
   cardListPanel.appendChild(footer);
@@ -143,8 +158,28 @@ const createDOMElement = (obj: StackObject): HTMLElement => {
   element.style.borderStyle = 'solid';
   element.style.borderWidth = borderWidthMap[obj.borderWidth];
   element.setAttribute('data-id', obj.id);
-  if (obj.id === selectedObject?.id) element.classList.add('is-selected');
-  element.addEventListener('click', (e) => { e.stopPropagation(); selectObject(obj); });
+  if (obj.id === selectedObject?.id && !isRunMode) element.classList.add('is-selected');
+
+  // Handle click action in run mode
+  element.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (isRunMode) {
+      if (obj.type === 'button') {
+        if (obj.action === 'jumpToCard' && obj.jumpToCardId) {
+          switchCard(obj.jumpToCardId);
+        } else if (obj.script) {
+          try {
+            eval(obj.script);
+          } catch (error) {
+            console.error('Script execution error:', error);
+            alert(`Script error: ${error.message}`);
+          }
+        }
+      }
+    } else { // Edit mode
+      selectObject(obj);
+    }
+  });
   return element;
 };
 
@@ -180,6 +215,12 @@ const deleteCurrentCard = () => {
 // --- プロパティパネル ---
 const updatePropertiesPanel = (obj: StackObject | null) => {
   propertiesPanel.innerHTML = '';
+  if (isRunMode) {
+    propertiesPanel.style.display = 'none';
+    return;
+  } else {
+    propertiesPanel.style.display = 'block';
+  }
 
   const createPropInput = (label: string, value: string | number, onUpdate: (newValue: any) => void, type = 'text') => {
     const group = document.createElement('div');
@@ -301,6 +342,7 @@ const deselectAllObjects = () => {
 };
 
 const selectObject = (targetObject: StackObject) => {
+  if (isRunMode) return; // Disable selection in run mode
   selectedObject = targetObject;
   renderCanvas();
   updatePropertiesPanel(targetObject);
@@ -330,6 +372,7 @@ const createObject = (x: number, y: number, type: ObjectType) => {
 const makeInteractive = (element: HTMLElement, stackObject: StackObject) => {
   interact(element)
     .draggable({
+      enabled: !isRunMode, // Disable dragging in run mode
       listeners: {
         move(event) {
           stackObject.x += event.dx;
@@ -342,6 +385,7 @@ const makeInteractive = (element: HTMLElement, stackObject: StackObject) => {
     })
     .resizable({
       edges: { left: true, right: true, bottom: true, top: true },
+      enabled: !isRunMode, // Disable resizing in run mode
       listeners: {
         move(event) {
           stackObject.width = event.rect.width;
@@ -366,6 +410,7 @@ const removeContextMenu = () => {
 };
 window.addEventListener('click', removeContextMenu);
 canvas.addEventListener('contextmenu', (e) => {
+  if (isRunMode) { e.preventDefault(); return; } // Disable context menu in run mode
   e.preventDefault();
   removeContextMenu();
   const canvasRect = canvas.getBoundingClientRect();
