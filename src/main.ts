@@ -155,10 +155,10 @@ const createDOMElement = (obj: StackObject): HTMLElement => {
   }
   element.textContent = obj.text;
   element.classList.add('stack-object');
-  element.style.left = `${obj.x}px`;
-  element.style.top = `${obj.y}px`;
-  element.style.width = `${obj.width}px`;
-  element.style.height = `${obj.height}px`;
+  element.style.left = obj.x + 'px';
+  element.style.top = obj.y + 'px';
+  element.style.width = obj.width + 'px';
+  element.style.height = obj.height + 'px';
   element.style.textAlign = obj.textAlign;
   element.style.borderStyle = 'solid';
   element.style.borderWidth = borderWidthMap[obj.borderWidth];
@@ -200,6 +200,129 @@ const addNewCard = () => {
   const newCard: Card = { id: newCardId, name: t('newCardName', { number: stack.cards.length + 1 }), objects: [] };
   stack.cards.push(newCard);
   switchCard(newCardId);
+};
+
+const exportToHtml = () => {
+  const currentStack = JSON.parse(JSON.stringify(stack)); // Deep copy to avoid modifying original stack
+  const stackDataString = JSON.stringify(currentStack, null, 2); // Store stringified data in a variable
+
+  const htmlContent = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exported Hi-Packa Stack</title>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: sans-serif; }
+        #exported-canvas {
+            position: relative;
+            width: 800px; /* Adjust as needed */
+            height: 600px; /* Adjust as needed */
+            border: 1px solid #ccc;
+            margin: 20px auto;
+            background-color: #f0f0f0;
+            overflow: hidden;
+        }
+        .stack-object {
+            position: absolute;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            word-break: break-all;
+        }
+        .text-object {
+            background-color: #fff;
+            border: 1px solid #aaa;
+        }
+        button {
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        /* Border styles */
+        .border-none { border-width: 0px !important; }
+        .border-thin { border-width: 1px !important; }
+        .border-medium { border-width: 2px !important; }
+        .border-thick { border-width: 4px !important; }
+    </style>
+</head>
+<body>
+    <div id="exported-canvas"></div>
+
+    <script>
+        const stackData = ${stackDataString};
+        let currentCardId = stackData.currentCardId;
+        const exportedCanvas = document.getElementById('exported-canvas');
+
+        const borderWidthMap = {
+            none: '0px',
+            thin: '1px',
+            medium: '2px',
+            thick: '4px',
+        };
+
+        const renderCard = (cardId) => {
+            exportedCanvas.innerHTML = '';
+            const currentCard = stackData.cards.find(c => c.id === cardId);
+            if (!currentCard) return;
+
+            currentCard.objects.forEach(obj => {
+                let element;
+                if (obj.type === 'button') {
+                    element = document.createElement('button');
+                } else {
+                    element = document.createElement('div');
+                    element.className = 'text-object';
+                }
+                element.textContent = obj.text;
+                element.classList.add('stack-object');
+                element.style.left = obj.x + 'px';
+                element.style.top = obj.y + 'px';
+                element.style.width = obj.width + 'px';
+                element.style.height = obj.height + 'px';
+                element.style.textAlign = obj.textAlign;
+                element.style.borderStyle = 'solid';
+                element.style.borderWidth = borderWidthMap[obj.borderWidth];
+                element.style.borderColor = '#333'; // Default border color for exported elements
+
+                if (obj.type === 'button') {
+                    element.addEventListener('click', () => {
+                        if (obj.action === 'jumpToCard' && obj.jumpToCardId) {
+                            currentCardId = obj.jumpToCardId;
+                            renderCard(currentCardId);
+                        } else if (obj.script) {
+                            try {
+                                // WARNING: eval is dangerous. For exported content, consider safer alternatives.
+                                eval(obj.script);
+                            } catch (error) {
+                                console.error('Script execution error:', error);
+                            }
+                        }
+                    });
+                }
+                exportedCanvas.appendChild(element);
+            });
+        };
+
+        // Initial render
+        renderCard(currentCardId);
+    </script>
+</body>
+</html>`;
+
+  const blob = new Blob([htmlContent], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'hi-packa-exported.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 };
 
 const deleteCurrentCard = () => {
@@ -382,8 +505,8 @@ const makeInteractive = (element: HTMLElement, stackObject: StackObject) => {
         move(event) {
           stackObject.x += event.dx;
           stackObject.y += event.dy;
-          element.style.left = `${stackObject.x}px`;
-          element.style.top = `${stackObject.y}px`;
+          element.style.left = stackObject.x + 'px';
+          element.style.top = stackObject.y + 'px';
         },
         end() { updatePropertiesPanel(stackObject); }
       },
@@ -398,8 +521,8 @@ const makeInteractive = (element: HTMLElement, stackObject: StackObject) => {
           stackObject.x += event.deltaRect.left;
           stackObject.y += event.deltaRect.top;
           Object.assign(element.style, {
-            width: `${stackObject.width}px`, height: `${stackObject.height}px`,
-            left: `${stackObject.x}px`, top: `${stackObject.y}px`,
+            width: stackObject.width + 'px', height: stackObject.height + 'px',
+            left: stackObject.x + 'px', top: stackObject.y + 'px',
           });
         },
         end() { updatePropertiesPanel(stackObject); }
