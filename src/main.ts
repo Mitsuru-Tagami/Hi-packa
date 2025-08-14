@@ -24,38 +24,136 @@ type StackObject = {
   textAlign: TextAlign;
   borderWidth: BorderWidth;
   script: string;
-  element: HTMLElement;
+};
+
+type Card = {
+  id: string;
+  name: string;
+  objects: StackObject[];
+};
+
+type Stack = {
+  cards: Card[];
+  currentCardId: string | null;
 };
 
 // --- アプリケーションの状態 ---
 const app = document.querySelector<HTMLDivElement>('#app')!;
+const cardListPanel = document.createElement('div');
+cardListPanel.id = 'card-list-panel';
 const mainContent = document.createElement('div');
 mainContent.id = 'main-content';
 const propertiesPanel = document.createElement('div');
 propertiesPanel.id = 'properties-panel';
 const canvas = document.createElement('div');
 canvas.id = 'card-canvas';
+
 mainContent.appendChild(canvas);
+app.appendChild(cardListPanel);
 app.appendChild(mainContent);
 app.appendChild(propertiesPanel);
 
-const cardObjects: StackObject[] = [];
+const firstCardId = `card-${Date.now()}`;
+const stack: Stack = {
+  cards: [{ id: firstCardId, name: 'Card 1', objects: [] }],
+  currentCardId: firstCardId,
+};
+
 let selectedObject: StackObject | null = null;
 
-// --- プロパティパネル更新 ---
+// --- ヘルパー ---
+const getCurrentCard = (): Card | undefined => stack.cards.find(c => c.id === stack.currentCardId);
+
+// --- レンダリング ---
+const renderAll = () => {
+  renderCardList();
+  renderCanvas();
+  updatePropertiesPanel(null);
+};
+
+const renderCardList = () => {
+  cardListPanel.innerHTML = '';
+  const container = document.createElement('div');
+  container.id = 'card-list-container';
+  stack.cards.forEach((card, index) => {
+    const item = document.createElement('div');
+    item.className = 'card-list-item';
+    item.textContent = `${index + 1}. ${card.name}`;
+    if (card.id === stack.currentCardId) item.classList.add('is-active');
+    item.addEventListener('click', () => switchCard(card.id));
+    container.appendChild(item);
+  });
+  cardListPanel.appendChild(container);
+  const addBtn = document.createElement('button');
+  addBtn.id = 'add-card-btn';
+  addBtn.textContent = '+ New Card';
+  addBtn.addEventListener('click', addNewCard);
+  cardListPanel.appendChild(addBtn);
+};
+
+const renderCanvas = () => {
+  canvas.innerHTML = '';
+  const currentCard = getCurrentCard();
+  if (!currentCard) return;
+  currentCard.objects.forEach(obj => {
+    const el = createDOMElement(obj);
+    canvas.appendChild(el);
+    makeInteractive(el, obj);
+  });
+};
+
+const createDOMElement = (obj: StackObject): HTMLElement => {
+  let element: HTMLElement;
+  if (obj.type === 'button') {
+    element = document.createElement('button');
+  } else {
+    element = document.createElement('div');
+    element.className = 'text-object';
+  }
+  element.textContent = obj.text;
+  element.classList.add('stack-object');
+  element.style.left = `${obj.x}px`;
+  element.style.top = `${obj.y}px`;
+  element.style.width = `${obj.width}px`;
+  element.style.height = `${obj.height}px`;
+  element.style.textAlign = obj.textAlign;
+  element.style.borderStyle = 'solid';
+  element.style.borderWidth = borderWidthMap[obj.borderWidth];
+  element.setAttribute('data-id', obj.id);
+  if (obj.id === selectedObject?.id) {
+    element.classList.add('is-selected');
+  }
+  element.addEventListener('click', (e) => {
+    e.stopPropagation();
+    selectObject(obj);
+  });
+  return element;
+};
+
+// --- カード管理 ---
+const switchCard = (cardId: string) => {
+  stack.currentCardId = cardId;
+  renderAll();
+};
+
+const addNewCard = () => {
+  const newCardId = `card-${Date.now()}`;
+  const newCard: Card = { id: newCardId, name: `Card ${stack.cards.length + 1}`, objects: [] };
+  stack.cards.push(newCard);
+  switchCard(newCardId);
+};
+
+// --- プロパティパネル ---
 const updatePropertiesPanel = (obj: StackObject | null) => {
   propertiesPanel.innerHTML = '';
-
   if (!obj) {
     propertiesPanel.innerHTML = '<h3>Properties</h3><p>No object selected.</p>';
     return;
   }
-
   const title = document.createElement('h3');
   title.textContent = `Properties: ${obj.type}`;
   propertiesPanel.appendChild(title);
 
-  // --- Helper Functions for creating inputs ---
   const createPropInput = (label: string, value: string | number, onUpdate: (newValue: any) => void) => {
     const group = document.createElement('div');
     group.className = 'prop-group';
@@ -104,128 +202,85 @@ const updatePropertiesPanel = (obj: StackObject | null) => {
     propertiesPanel.appendChild(group);
   };
 
-  // --- Create fields ---
   createPropInput('Text', obj.text, (newValue) => {
     obj.text = newValue;
-    obj.element.textContent = newValue;
+    renderCanvas();
   });
 
   if (obj.type === 'text' || obj.type === 'button') {
     createPropSelect('Text Align', obj.textAlign, ['left', 'center', 'right'], (newValue) => {
       obj.textAlign = newValue;
-      obj.element.style.textAlign = newValue;
+      renderCanvas();
     });
     createPropSelect('Border Width', obj.borderWidth, ['none', 'thin', 'medium', 'thick'], (newValue) => {
       obj.borderWidth = newValue;
-      obj.element.style.borderWidth = borderWidthMap[newValue];
+      renderCanvas();
     });
   }
 
   createPropInput('X', Math.round(obj.x), (newValue) => {
     obj.x = Number(newValue);
-    obj.element.style.left = `${obj.x}px`;
+    renderCanvas();
   });
-
   createPropInput('Y', Math.round(obj.y), (newValue) => {
     obj.y = Number(newValue);
-    obj.element.style.top = `${obj.y}px`;
+    renderCanvas();
   });
-
   createPropInput('Width', Math.round(obj.width), (newValue) => {
     obj.width = Number(newValue);
-    obj.element.style.width = `${obj.width}px`;
+    renderCanvas();
   });
-
   createPropInput('Height', Math.round(obj.height), (newValue) => {
     obj.height = Number(newValue);
-    obj.element.style.height = `${obj.height}px`;
+    renderCanvas();
   });
-
-  createPropTextarea('Script (onclick)', obj.script, (newValue) => {
-    obj.script = newValue;
-  });
+  createPropTextarea('Script (onclick)', obj.script, (newValue) => { obj.script = newValue; });
 };
 
-// --- Object Selection ---
+// --- オブジェクト選択 ---
 const deselectAllObjects = () => {
   selectedObject = null;
-  cardObjects.forEach(obj => obj.element.classList.remove('is-selected'));
+  renderCanvas();
   updatePropertiesPanel(null);
 };
 
 const selectObject = (targetObject: StackObject) => {
-  deselectAllObjects();
   selectedObject = targetObject;
-  targetObject.element.classList.add('is-selected');
+  renderCanvas();
   updatePropertiesPanel(targetObject);
 };
 
 canvas.addEventListener('click', deselectAllObjects);
 
-// --- Object Creation & Interaction ---
+// --- オブジェクト操作 ---
 const createObject = (x: number, y: number, type: ObjectType) => {
-  const id = `obj-${Date.now()}`;
-  const defaultBorderWidth: BorderWidth = type === 'button' ? 'thin' : 'thin';
-
-  let element: HTMLElement;
-  let initialText = '';
-
-  if (type === 'button') {
-    const button = document.createElement('button');
-    button.textContent = 'Button';
-    initialText = 'Button';
-    element = button;
-  } else {
-    const text = document.createElement('div');
-    text.textContent = 'Text Box';
-    text.className = 'text-object';
-    initialText = 'Text Box';
-    element = text;
-  }
-
-  element.classList.add('stack-object');
-  element.style.left = `${x}px`;
-  element.style.top = `${y}px`;
-  element.style.width = '100px';
-  element.style.height = '50px';
-  element.style.textAlign = 'left';
-  element.style.borderStyle = 'solid';
-  element.style.borderWidth = borderWidthMap[defaultBorderWidth];
-  element.setAttribute('data-id', id);
-
+  const currentCard = getCurrentCard();
+  if (!currentCard) return;
   const newObject: StackObject = {
-    id, type, x, y, width: 100, height: 50, text: initialText,
-    textAlign: 'left', borderWidth: defaultBorderWidth, script: '', element,
+    id: `obj-${Date.now()}`,
+    type,
+    x, y, width: 100, height: 50,
+    text: type === 'button' ? 'Button' : 'Text Box',
+    textAlign: 'left',
+    borderWidth: 'thin',
+    script: '',
   };
-
-  element.addEventListener('click', (e) => {
-    e.stopPropagation();
-    selectObject(newObject);
-  });
-
-  cardObjects.push(newObject);
-  canvas.appendChild(element);
-  makeInteractive(newObject);
+  currentCard.objects.push(newObject);
   selectObject(newObject);
 };
 
-const makeInteractive = (stackObject: StackObject) => {
-  interact(stackObject.element)
-    .on('down', (event) => {
-      selectObject(stackObject);
-      event.stopPropagation();
-    })
+const makeInteractive = (element: HTMLElement, stackObject: StackObject) => {
+  interact(element)
     .draggable({
       listeners: {
         move(event) {
           stackObject.x += event.dx;
           stackObject.y += event.dy;
-          event.target.style.left = `${stackObject.x}px`;
-          event.target.style.top = `${stackObject.y}px`;
-          updatePropertiesPanel(stackObject);
+          element.style.left = `${stackObject.x}px`;
+          element.style.top = `${stackObject.y}px`;
         },
+        end() { updatePropertiesPanel(stackObject); }
       },
-      inertia: true,
     })
     .resizable({
       edges: { left: true, right: true, bottom: true, top: true },
@@ -235,24 +290,21 @@ const makeInteractive = (stackObject: StackObject) => {
           stackObject.height = event.rect.height;
           stackObject.x += event.deltaRect.left;
           stackObject.y += event.deltaRect.top;
-          Object.assign(event.target.style, {
+          Object.assign(element.style, {
             width: `${stackObject.width}px`, height: `${stackObject.height}px`,
             left: `${stackObject.x}px`, top: `${stackObject.y}px`,
           });
-          updatePropertiesPanel(stackObject);
         },
+        end() { updatePropertiesPanel(stackObject); }
       },
-      inertia: true,
     });
 };
 
-// --- Context Menu ---
+// --- コンテキストメニュー ---
 let contextMenu: HTMLDivElement | null = null;
 const removeContextMenu = () => {
-  if (contextMenu) {
-    contextMenu.remove();
-    contextMenu = null;
-  }
+  if (contextMenu) contextMenu.remove();
+  contextMenu = null;
 };
 window.addEventListener('click', removeContextMenu);
 canvas.addEventListener('contextmenu', (e) => {
@@ -282,5 +334,5 @@ canvas.addEventListener('contextmenu', (e) => {
   document.body.appendChild(contextMenu);
 });
 
-// Initial Panel State
-updatePropertiesPanel(null);
+// --- 初期描画 ---
+renderAll();

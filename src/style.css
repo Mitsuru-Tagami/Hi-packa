@@ -13,6 +13,7 @@ body {
   margin: 0;
   background-color: #333;
   color: #f0f0f0;
+  overflow: hidden;
 }
 
 #app {
@@ -22,6 +23,53 @@ body {
   height: 100vh;
 }
 
+/* --- Left Panel (Card List) --- */
+#card-list-panel {
+  width: 220px;
+  flex-shrink: 0;
+  background-color: #2c2c2c;
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+#card-list-container {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.card-list-item {
+  padding: 10px;
+  margin-bottom: 8px;
+  background-color: #444;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.card-list-item:hover {
+  background-color: #555;
+}
+
+.card-list-item.is-active {
+  border-color: #4a90e2;
+  background-color: #4a90e24d; /* semi-transparent blue */
+}
+
+#add-card-btn {
+  padding: 10px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* --- Center Content (Canvas) --- */
 #main-content {
   flex-grow: 1;
   display: flex;
@@ -43,7 +91,7 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
-/* --- Properties Panel --- */
+/* --- Right Panel (Properties) --- */
 #properties-panel {
   width: 280px;
   flex-shrink: 0;
@@ -96,7 +144,6 @@ body {
 }
 
 /* --- Object Styles --- */
-
 .stack-object {
   position: absolute;
   box-sizing: border-box;
@@ -114,7 +161,6 @@ body {
 }
 
 /* --- Context Menu Styles --- */
-
 .context-menu {
   position: absolute;
   background-color: white;
