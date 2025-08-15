@@ -81,14 +81,16 @@ body {
 #card-canvas {
   width: 100%;
   height: 100%;
-  max-width: 1000px;
-  max-height: 750px;
-  aspect-ratio: 4 / 3;
+  max-width: 414px; /* iPhone 8 Plus width */
+  max-height: 736px; /* iPhone 8 Plus height */
+  aspect-ratio: 9 / 16;
   background-color: #f0f0f0;
   border: 1px solid #ccc;
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  /* Add a bit of a border radius to look more like a device */
+  border-radius: 20px; 
 }
 
 /* --- Right Panel (Properties) --- */
