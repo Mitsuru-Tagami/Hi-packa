@@ -3,7 +3,7 @@ import interact from 'interactjs';
 import i18next, { t } from './i18n';
 
 // --- タイプ定義 ---
-type ObjectType = 'button' | 'text';
+type ObjectType = 'button' | 'text' | 'image';
 type TextAlign = 'left' | 'center' | 'right';
 type BorderWidth = 'none' | 'thin' | 'medium' | 'thick';
 type ButtonAction = 'none' | 'jumpToCard';
@@ -28,6 +28,8 @@ type StackObject = {
   script: string;
   action?: ButtonAction;
   jumpToCardId?: string | null;
+  src?: string;
+  objectFit?: 'contain' | 'fill';
   // New text formatting properties
   fontSize?: string;
   fontWeight?: 'normal' | 'bold';
@@ -156,6 +158,10 @@ const createDOMElement = (obj: StackObject): HTMLElement => {
   let element: HTMLElement;
   if (obj.type === 'button') {
     element = document.createElement('button') as HTMLElement;
+  } else if (obj.type === 'image') { // Add image handling
+    element = document.createElement('img') as HTMLImageElement;
+    (element as HTMLImageElement).src = obj.src || '';
+    element.style.objectFit = obj.objectFit || 'contain'; // Apply objectFit style
   } else {
     element = document.createElement('div') as HTMLElement;
     // Apply new text formatting styles
@@ -446,6 +452,8 @@ const updatePropertiesPanel = (obj: StackObject | null) => {
 
   if (obj.type === 'text') {
     createPropTextarea(t('text'), obj.text, (newValue) => { obj.text = newValue; renderCanvas(); });
+  } else if (obj.type === 'image') { // For image objects, use 'imageName'
+    createPropInput(t('imageName'), obj.text, (newValue) => { obj.text = newValue; renderCanvas(); });
   } else { // For button objects, keep it as input
     createPropInput(t('text'), obj.text, (newValue) => { obj.text = newValue; renderCanvas(); });
   }
@@ -454,10 +462,11 @@ const updatePropertiesPanel = (obj: StackObject | null) => {
     createPropSelect(t('textAlign'), obj.textAlign, 
       [{value: 'left', text: t('alignLeft')}, {value: 'center', text: t('alignCenter')}, {value: 'right', text: t('alignRight')}],
       (newValue) => { obj.textAlign = newValue; renderCanvas(); });
-    createPropSelect(t('borderWidth'), obj.borderWidth, 
-      [{value: 'none', text: t('borderNone')}, {value: 'thin', text: t('borderThin')}, {value: 'medium', text: t('borderMedium')}, {value: 'thick', text: t('borderThick')}],
-      (newValue) => { obj.borderWidth = newValue; renderCanvas(); });
   }
+
+  createPropSelect(t('borderWidth'), obj.borderWidth, 
+    [{value: 'none', text: t('borderNone')}, {value: 'thin', text: t('borderThin')}, {value: 'medium', text: t('borderMedium')}, {value: 'thick', text: t('borderThick')}],
+    (newValue) => { obj.borderWidth = newValue; renderCanvas(); });
 
   // Add new text formatting controls for text objects
   if (obj.type === 'text') {
@@ -492,6 +501,14 @@ const updatePropertiesPanel = (obj: StackObject | null) => {
       { value: 'Lucida Console, monospace', text: 'Lucida Console' },
     ];
     createPropSelect(t('fontFamily'), obj.fontFamily || 'sans-serif', fontOptions, (newValue) => { obj.fontFamily = newValue; renderCanvas(); });
+  }
+
+  if (obj.type === 'image') { // Add image properties
+    createPropInput(t('imageSource'), obj.src || '', (newValue) => { obj.src = newValue; renderCanvas(); });
+    // Add objectFit select
+    createPropSelect(t('objectFit'), obj.objectFit || 'contain',
+      [{value: 'contain', text: t('objectFitContain')}, {value: 'fill', text: t('objectFitFill')}],
+      (newValue) => { obj.objectFit = newValue; renderCanvas(); });
   }
 
   if (obj.type === 'button') {
@@ -586,6 +603,13 @@ const createObject = (x: number, y: number, type: ObjectType) => {
       color: '#333333', // Default text color
       fontFamily: 'sans-serif', // Default font family
     }),
+    // Add new properties for image objects
+    ...(type === 'image' && {
+      src: 'https://via.placeholder.com/150', // Default placeholder image
+      width: 150,
+      height: 150,
+      objectFit: 'contain', // Default object-fit for images
+    }),
   };
   currentCard.objects.push(newObject);
   selectObject(newObject);
@@ -645,6 +669,7 @@ canvas.addEventListener('contextmenu', (e) => {
   const menuItems = [
     { label: t('contextMenuAddButton'), type: 'button' as ObjectType },
     { label: t('contextMenuAddText'), type: 'text' as ObjectType },
+    { label: t('contextMenuAddImage'), type: 'image' as ObjectType }, // Add this line
   ];
   menuItems.forEach(itemInfo => {
     const item = document.createElement('div');
