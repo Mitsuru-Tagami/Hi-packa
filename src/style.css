@@ -232,6 +232,7 @@ body {
   position: absolute;
   box-sizing: border-box;
   color: #333;
+  white-space: pre-wrap; /* Add this line */
 }
 
 .text-object {

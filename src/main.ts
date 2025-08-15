@@ -28,6 +28,13 @@ type StackObject = {
   script: string;
   action?: ButtonAction;
   jumpToCardId?: string | null;
+  // New text formatting properties
+  fontSize?: string;
+  fontWeight?: 'normal' | 'bold';
+  fontStyle?: 'normal' | 'italic';
+  textDecoration?: 'none' | 'underline';
+  color?: string;
+  fontFamily?: string;
 };
 
 type Card = {
@@ -148,10 +155,18 @@ const renderCanvas = () => {
 const createDOMElement = (obj: StackObject): HTMLElement => {
   let element: HTMLElement;
   if (obj.type === 'button') {
-    element = document.createElement('button');
+    element = document.createElement('button') as HTMLElement;
   } else {
-    element = document.createElement('div');
-    element.className = 'text-object';
+    element = document.createElement('div') as HTMLElement;
+    // Apply new text formatting styles
+    if (obj.type === 'text') {
+      if (obj.fontSize) element.style.fontSize = obj.fontSize;
+      if (obj.fontWeight) element.style.fontWeight = obj.fontWeight;
+      if (obj.fontStyle) element.style.fontStyle = obj.fontStyle;
+      if (obj.textDecoration) element.style.textDecoration = obj.textDecoration;
+      if (obj.color) element.style.color = obj.color;
+      if (obj.fontFamily) element.style.fontFamily = obj.fontFamily; // Add this line
+    }
   }
   element.textContent = obj.text;
   element.classList.add('stack-object');
@@ -175,9 +190,9 @@ const createDOMElement = (obj: StackObject): HTMLElement => {
         } else if (obj.script) {
           try {
             eval(obj.script);
-          } catch (error) {
-            console.error('Script execution error:', error);
-            alert(`Script error: ${error.message}`);
+          } catch (error: unknown) {
+            console.error('Script execution error:', error as Error);
+            alert(`Script error: ${(error as Error).message}`);
           }
         }
       }
@@ -273,10 +288,9 @@ const exportToHtml = () => {
             currentCard.objects.forEach(obj => {
                 let element;
                 if (obj.type === 'button') {
-                    element = document.createElement('button');
+                    element = document.createElement('button') as HTMLElement;
                 } else {
-                    element = document.createElement('div');
-                    element.className = 'text-object';
+                    element = document.createElement('div') as HTMLElement;
                 }
                 element.textContent = obj.text;
                 element.classList.add('stack-object');
@@ -298,8 +312,8 @@ const exportToHtml = () => {
                             try {
                                 // WARNING: eval is dangerous. For exported content, consider safer alternatives.
                                 eval(obj.script);
-                            } catch (error) {
-                                console.error('Script execution error:', error);
+                            } catch (error: unknown) {
+                                console.error('Script execution error:', error as Error);
                             }
                         }
                     });
@@ -337,6 +351,18 @@ const deleteCurrentCard = () => {
     stack.cards.splice(currentIndex, 1);
     const nextIndex = Math.max(0, currentIndex - 1);
     switchCard(stack.cards[nextIndex].id);
+  }
+};
+
+// --- オブジェクト削除 ---
+const deleteObject = (objToDelete: StackObject) => {
+  const currentCard = getCurrentCard();
+  if (!currentCard) return;
+
+  if (window.confirm(t('deleteObjectConfirmation', { objectType: t(objToDelete.type) }))) {
+    currentCard.objects = currentCard.objects.filter(obj => obj.id !== objToDelete.id);
+    selectedObject = null; // Deselect the object after deletion
+    renderAll(); // Re-render everything to reflect changes
   }
 };
 
@@ -383,6 +409,19 @@ const updatePropertiesPanel = (obj: StackObject | null) => {
     propertiesPanel.appendChild(group);
   };
 
+  const createPropTextarea = (label: string, value: string, onUpdate: (newValue: string) => void) => {
+    const group = document.createElement('div');
+    group.className = 'prop-group';
+    const labelEl = document.createElement('label');
+    labelEl.textContent = label;
+    const textareaEl = document.createElement('textarea');
+    textareaEl.value = value;
+    textareaEl.addEventListener('input', () => onUpdate(textareaEl.value));
+    group.appendChild(labelEl);
+    group.appendChild(textareaEl);
+    propertiesPanel.appendChild(group);
+  };
+
   if (!obj) {
     const currentCard = getCurrentCard();
     if (!currentCard) return;
@@ -405,7 +444,11 @@ const updatePropertiesPanel = (obj: StackObject | null) => {
   title.textContent = t('objectProperties', { type: obj.type });
   propertiesPanel.appendChild(title);
 
-  createPropInput(t('text'), obj.text, (newValue) => { obj.text = newValue; renderCanvas(); });
+  if (obj.type === 'text') {
+    createPropTextarea(t('text'), obj.text, (newValue) => { obj.text = newValue; renderCanvas(); });
+  } else { // For button objects, keep it as input
+    createPropInput(t('text'), obj.text, (newValue) => { obj.text = newValue; renderCanvas(); });
+  }
 
   if (obj.type === 'text' || obj.type === 'button') {
     createPropSelect(t('textAlign'), obj.textAlign, 
@@ -414,6 +457,41 @@ const updatePropertiesPanel = (obj: StackObject | null) => {
     createPropSelect(t('borderWidth'), obj.borderWidth, 
       [{value: 'none', text: t('borderNone')}, {value: 'thin', text: t('borderThin')}, {value: 'medium', text: t('borderMedium')}, {value: 'thick', text: t('borderThick')}],
       (newValue) => { obj.borderWidth = newValue; renderCanvas(); });
+  }
+
+  // Add new text formatting controls for text objects
+  if (obj.type === 'text') {
+    createPropInput(t('fontSize'), obj.fontSize || '16px', (newValue) => { obj.fontSize = newValue; renderCanvas(); }, 'text');
+    createPropSelect(t('fontWeight'), obj.fontWeight || 'normal',
+      [{value: 'normal', text: t('fontWeightNormal')}, {value: 'bold', text: t('fontWeightBold')}],
+      (newValue) => { obj.fontWeight = newValue; renderCanvas(); });
+    createPropSelect(t('fontStyle'), obj.fontStyle || 'normal',
+      [{value: 'normal', text: t('fontStyleNormal')}, {value: 'italic', text: t('fontStyleItalic')}],
+      (newValue) => { obj.fontStyle = newValue; renderCanvas(); });
+    createPropSelect(t('textDecoration'), obj.textDecoration || 'none',
+      [{value: 'none', text: t('textDecorationNone')}, {value: 'underline', text: t('textDecorationUnderline')}],
+      (newValue) => { obj.textDecoration = newValue; renderCanvas(); });
+    createPropInput(t('color'), obj.color || '#333333', (newValue) => { obj.color = newValue; renderCanvas(); }, 'color'); // Use type 'color' for color picker
+
+    // Add font family select
+    const fontOptions = [
+      { value: 'sans-serif', text: 'Sans-serif (Default)' },
+      { value: 'serif', text: 'Serif' },
+      { value: 'monospace', text: 'Monospace' },
+      { value: 'cursive', text: 'Cursive' },
+      { value: 'fantasy', text: 'Fantasy' },
+      { value: 'Arial, sans-serif', text: 'Arial' },
+      { value: 'Verdana, sans-serif', text: 'Verdana' },
+      { value: 'Helvetica, sans-serif', text: 'Helvetica' },
+      { value: 'Tahoma, sans-serif', text: 'Tahoma' },
+      { value: 'Trebuchet MS, sans-serif', text: 'Trebuchet MS' },
+      { value: 'Times New Roman, serif', text: 'Times New Roman' },
+      { value: 'Georgia, serif', text: 'Georgia' },
+      { value: 'Palatino Linotype, Palatino, serif', text: 'Palatino Linotype' },
+      { value: 'Courier New, monospace', text: 'Courier New' },
+      { value: 'Lucida Console, monospace', text: 'Lucida Console' },
+    ];
+    createPropSelect(t('fontFamily'), obj.fontFamily || 'sans-serif', fontOptions, (newValue) => { obj.fontFamily = newValue; renderCanvas(); });
   }
 
   if (obj.type === 'button') {
@@ -460,6 +538,13 @@ const updatePropertiesPanel = (obj: StackObject | null) => {
   scriptGroup.appendChild(aiHelperLink);
 
   propertiesPanel.appendChild(scriptGroup);
+
+  // --- オブジェクト削除ボタン ---
+  const deleteObjectBtn = document.createElement('button');
+  deleteObjectBtn.textContent = t('deleteObject'); // Will need to add this to i18n
+  deleteObjectBtn.className = 'delete-btn'; // Use the same class as deleteCardBtn for styling
+  deleteObjectBtn.addEventListener('click', () => deleteObject(obj!));
+  propertiesPanel.appendChild(deleteObjectBtn);
 };
 
 // --- オブジェクト選択 ---
@@ -492,6 +577,15 @@ const createObject = (x: number, y: number, type: ObjectType) => {
     script: '',
     action: 'none',
     jumpToCardId: null,
+    // Add new properties for text objects
+    ...(type === 'text' && {
+      fontSize: '16px',
+      fontWeight: 'normal',
+      fontStyle: 'normal',
+      textDecoration: 'none',
+      color: '#333333', // Default text color
+      fontFamily: 'sans-serif', // Default font family
+    }),
   };
   currentCard.objects.push(newObject);
   selectObject(newObject);
