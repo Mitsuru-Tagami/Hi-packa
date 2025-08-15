@@ -69,10 +69,99 @@ app.appendChild(cardListPanel);
 app.appendChild(mainContent);
 app.appendChild(propertiesPanel);
 
-const firstCardId = `card-${Date.now()}`;
+const welcomeCardId = `card-welcome`;
+const aboutCardId = `card-about`; // New ID for the second card
+
 const stack: Stack = {
-  cards: [{ id: firstCardId, name: t('newCardName', { number: 1 }), objects: [] }],
-  currentCardId: firstCardId,
+  cards: [
+    {
+      id: welcomeCardId,
+      name: t('welcomeCardName'), // New translation key for "はいぱか（仮）へようこそ"
+      objects: [
+        // Welcome message objects
+        {
+          id: `obj-welcome-title-${Date.now()}`,
+          type: 'text',
+          x: 100, y: 100, width: 300, height: 50,
+          text: t('welcomeTitle'),
+          textAlign: 'center',
+          fontSize: '24px',
+          fontWeight: 'bold',
+          fontFamily: 'sans-serif',
+          color: '#333333',
+          borderWidth: 'none',
+          script: '',
+        },
+        {
+          id: `obj-welcome-instruction-${Date.now()}`,
+          type: 'text',
+          x: 50, y: 180, width: 400, height: 80,
+          text: t('welcomeInstruction'),
+          textAlign: 'left',
+          fontSize: '16px',
+          fontFamily: 'sans-serif',
+          color: '#333333',
+          borderWidth: 'none',
+          script: '',
+        },
+        {
+          id: `obj-start-button-${Date.now()}`,
+          type: 'button',
+          x: 200, y: 300, width: 100, height: 40,
+          text: t('startButton'),
+          action: 'jumpToCard',
+          jumpToCardId: aboutCardId, // Link to the second card
+          textAlign: 'center',
+          borderWidth: 'thin',
+          script: '',
+        },
+      ],
+    },
+    {
+      id: aboutCardId,
+      name: t('aboutCardName'), // New translation key for "はいぱか（仮）とは"
+      objects: [
+        // About message objects
+        {
+          id: `obj-about-title-${Date.now()}`,
+          type: 'text',
+          x: 100, y: 100, width: 300, height: 50,
+          text: t('aboutTitle'),
+          textAlign: 'center',
+          fontSize: '24px',
+          fontWeight: 'bold',
+          fontFamily: 'sans-serif',
+          color: '#333333',
+          borderWidth: 'none',
+          script: '',
+        },
+        {
+          id: `obj-about-desc-${Date.now()}`,
+          type: 'text',
+          x: 50, y: 180, width: 400, height: 100,
+          text: t('aboutDescription'),
+          textAlign: 'left',
+          fontSize: '16px',
+          fontFamily: 'sans-serif',
+          color: '#333333',
+          borderWidth: 'none',
+          script: '',
+        },
+        {
+          id: `obj-back-button-${Date.now()}`,
+          type: 'button',
+          x: 200, y: 300, width: 100, height: 40,
+          text: t('backButton'),
+          action: 'jumpToCard',
+          jumpToCardId: welcomeCardId, // Link back to welcome card
+          textAlign: 'center',
+          borderWidth: 'thin',
+          script: '',
+        },
+      ],
+    },
+  ],
+  currentCardId: welcomeCardId, // Start with the welcome card
 };
 
 let selectedObject: StackObject | null = null;

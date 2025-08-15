@@ -3,3 +3,4 @@ dist
 .env
 gemini_chat_log_*.txt
 work_logs/
+build-gh-pages/
