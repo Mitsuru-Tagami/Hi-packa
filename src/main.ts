@@ -421,12 +421,13 @@ const exportToHtml = () => {
         body { margin: 0; overflow: hidden; font-family: sans-serif; }
         #exported-canvas {
             position: relative;
-            width: 800px; /* Adjust as needed */
-            height: 600px; /* Adjust as needed */
+            width: 414px; /* Fixed to portrait */
+            height: 736px; /* Fixed to portrait */
             border: 1px solid #ccc;
             margin: 20px auto;
             background-color: #f0f0f0;
             overflow: hidden;
+            border-radius: 20px;
         }
         .stack-object {
             position: absolute;
@@ -436,17 +437,10 @@ const exportToHtml = () => {
             justify-content: center;
             padding: 5px;
             word-break: break-all;
+            white-space: pre-wrap;
         }
-        .text-object {
-            background-color: #fff;
-            border: 1px solid #aaa;
-        }
-        button {
-            cursor: pointer;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
+        button.stack-object {
+            padding: 0; /* Reset padding for buttons */
         }
         /* Border styles */
         .border-none { border-width: 0px !important; }
@@ -469,6 +463,12 @@ const exportToHtml = () => {
             medium: '2px',
             thick: '4px',
         };
+        
+        // We need a way to switch cards and re-render
+        const switchCard = (cardId) => {
+            currentCardId = cardId;
+            renderCard(currentCardId);
+        };
 
         const renderCard = (cardId) => {
             exportedCanvas.innerHTML = '';
@@ -478,10 +478,13 @@ const exportToHtml = () => {
             currentCard.objects.forEach(obj => {
                 let element;
                 if (obj.type === 'button') {
-                    element = document.createElement('button') as HTMLElement;
+                    element = document.createElement('button');
                 } else {
-                    element = document.createElement('div') as HTMLElement;
+                    // For text and image, we'll use a div
+                    element = document.createElement('div');
                 }
+                
+                // Common styles
                 element.textContent = obj.text;
                 element.classList.add('stack-object');
                 element.style.left = obj.x + 'px';
@@ -491,19 +494,32 @@ const exportToHtml = () => {
                 element.style.textAlign = obj.textAlign;
                 element.style.borderStyle = 'solid';
                 element.style.borderWidth = borderWidthMap[obj.borderWidth];
-                element.style.borderColor = '#333'; // Default border color for exported elements
+                element.style.borderColor = '#333';
+
+                // Type-specific styles
+                if (obj.type === 'text') {
+                    if (obj.fontSize) element.style.fontSize = obj.fontSize;
+                    if (obj.fontWeight) element.style.fontWeight = obj.fontWeight;
+                    if (obj.fontStyle) element.style.fontStyle = obj.fontStyle;
+                    if (obj.textDecoration) element.style.textDecoration = obj.textDecoration;
+                    if (obj.color) element.style.color = obj.color;
+                    if (obj.fontFamily) element.style.fontFamily = obj.fontFamily;
+                }
 
                 if (obj.type === 'button') {
                     element.addEventListener('click', () => {
                         if (obj.action === 'jumpToCard' && obj.jumpToCardId) {
-                            currentCardId = obj.jumpToCardId;
-                            renderCard(currentCardId);
+                            switchCard(obj.jumpToCardId);
                         } else if (obj.script) {
                             try {
-                                // WARNING: eval is dangerous. For exported content, consider safer alternatives.
+                                // WARNING: eval is dangerous. This is the core of Hi-Packa's functionality.
+                                // The script needs access to a global renderAll and switchCard function.
+                                // We define a limited scope for safety.
+                                const renderAll = () => renderCard(currentCardId);
                                 eval(obj.script);
-                            } catch (error: unknown) {
-                                console.error('Script execution error:', error as Error);
+                            } catch (error) {
+                                console.error('Script execution error:', error);
+                                alert('Script error: ' + error.message);
                             }
                         }
                     });
