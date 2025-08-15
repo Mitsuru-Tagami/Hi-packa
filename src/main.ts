@@ -118,7 +118,7 @@ const renderCardList = () => {
 
   const settingsBtn = document.createElement('button');
   settingsBtn.textContent = t('settings');
-  settingsBtn.onclick = () => { document.querySelector('.modal-overlay')!.style.display = 'flex'; };
+  settingsBtn.onclick = () => { (document.querySelector('.modal-overlay') as HTMLElement)!.style.display = 'flex'; };
 
   const runModeBtn = document.createElement('button');
   runModeBtn.textContent = isRunMode ? t('editMode') : t('runMode');
@@ -382,7 +382,7 @@ const updatePropertiesPanel = (obj: StackObject | null) => {
     propertiesPanel.style.display = 'block';
   }
 
-  const createPropInput = (label: string, value: string | number, onUpdate: (newValue: any) => void, type = 'text') => {
+  const createPropInput = (label: string, value: string | number, onUpdate: (newValue: string) => void, type = 'text') => {
     const group = document.createElement('div');
     group.className = 'prop-group';
     const labelEl = document.createElement('label');
@@ -396,7 +396,7 @@ const updatePropertiesPanel = (obj: StackObject | null) => {
     propertiesPanel.appendChild(group);
   };
 
-  const createPropSelect = (label: string, value: string, options: {value: string, text: string}[], onUpdate: (newValue: any) => void) => {
+  const createPropSelect = (label: string, value: string, options: {value: string, text: string}[], onUpdate: (newValue: string) => void) => {
     const group = document.createElement('div');
     group.className = 'prop-group';
     const labelEl = document.createElement('label');
@@ -461,25 +461,25 @@ const updatePropertiesPanel = (obj: StackObject | null) => {
   if (obj.type === 'text' || obj.type === 'button') {
     createPropSelect(t('textAlign'), obj.textAlign, 
       [{value: 'left', text: t('alignLeft')}, {value: 'center', text: t('alignCenter')}, {value: 'right', text: t('alignRight')}],
-      (newValue) => { obj.textAlign = newValue; renderCanvas(); });
+      (newValue) => { obj.textAlign = newValue as TextAlign; renderCanvas(); });
   }
 
   createPropSelect(t('borderWidth'), obj.borderWidth, 
     [{value: 'none', text: t('borderNone')}, {value: 'thin', text: t('borderThin')}, {value: 'medium', text: t('borderMedium')}, {value: 'thick', text: t('borderThick')}],
-    (newValue) => { obj.borderWidth = newValue; renderCanvas(); });
+    (newValue) => { obj.borderWidth = newValue as BorderWidth; renderCanvas(); });
 
   // Add new text formatting controls for text objects
   if (obj.type === 'text') {
     createPropInput(t('fontSize'), obj.fontSize || '16px', (newValue) => { obj.fontSize = newValue; renderCanvas(); }, 'text');
     createPropSelect(t('fontWeight'), obj.fontWeight || 'normal',
       [{value: 'normal', text: t('fontWeightNormal')}, {value: 'bold', text: t('fontWeightBold')}],
-      (newValue) => { obj.fontWeight = newValue; renderCanvas(); });
+      (newValue) => { obj.fontWeight = newValue as 'normal' | 'bold'; renderCanvas(); });
     createPropSelect(t('fontStyle'), obj.fontStyle || 'normal',
       [{value: 'normal', text: t('fontStyleNormal')}, {value: 'italic', text: t('fontStyleItalic')}],
-      (newValue) => { obj.fontStyle = newValue; renderCanvas(); });
+      (newValue) => { obj.fontStyle = newValue as 'normal' | 'italic'; renderCanvas(); });
     createPropSelect(t('textDecoration'), obj.textDecoration || 'none',
       [{value: 'none', text: t('textDecorationNone')}, {value: 'underline', text: t('textDecorationUnderline')}],
-      (newValue) => { obj.textDecoration = newValue; renderCanvas(); });
+      (newValue) => { obj.textDecoration = newValue as 'none' | 'underline'; renderCanvas(); });
     createPropInput(t('color'), obj.color || '#333333', (newValue) => { obj.color = newValue; renderCanvas(); }, 'color'); // Use type 'color' for color picker
 
     // Add font family select
@@ -508,13 +508,13 @@ const updatePropertiesPanel = (obj: StackObject | null) => {
     // Add objectFit select
     createPropSelect(t('objectFit'), obj.objectFit || 'contain',
       [{value: 'contain', text: t('objectFitContain')}, {value: 'fill', text: t('objectFitFill')}],
-      (newValue) => { obj.objectFit = newValue; renderCanvas(); });
+      (newValue) => { obj.objectFit = newValue as 'contain' | 'fill'; renderCanvas(); });
   }
 
   if (obj.type === 'button') {
     const actionOptions = [{ value: 'none', text: t('actionNone') }, { value: 'jumpToCard', text: t('actionGoToCard') }];
     createPropSelect(t('action'), obj.action || 'none', actionOptions, (newValue) => {
-      obj.action = newValue;
+      obj.action = newValue as ButtonAction;
       if (newValue !== 'jumpToCard') obj.jumpToCardId = null;
       updatePropertiesPanel(obj);
     });
