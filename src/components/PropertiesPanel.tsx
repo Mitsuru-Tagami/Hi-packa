@@ -9,15 +9,17 @@ import { parseUnitValue } from '../utils';
 interface PropertiesPanelProps {
   selectedObject: StackObject | null;
   onUpdateObject: (object: StackObject) => void;
+  isRunMode: boolean;
 }
 
-const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpdateObject }) => {
+const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpdateObject, isRunMode }) => {
   // Local state to manage input field values
   const [localX, setLocalX] = useState<string>('');
   const [localY, setLocalY] = useState<string>('');
   const [localWidth, setLocalWidth] = useState<string>('');
   const [localHeight, setLocalHeight] = useState<string>('');
   const [localText, setLocalText] = useState<string>(''); // For text field
+  const [localScript, setLocalScript] = useState<string>(''); // For script field
 
   // Update local state when selectedObject changes
   useEffect(() => {
@@ -27,6 +29,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpd
       setLocalWidth(selectedObject.width.toFixed(2));
       setLocalHeight(selectedObject.height.toFixed(2));
       setLocalText(selectedObject.text);
+      setLocalScript(selectedObject.script || ''); // Initialize script
     } else {
       // Clear local state if no object is selected
       setLocalX('');
@@ -34,6 +37,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpd
       setLocalWidth('');
       setLocalHeight('');
       setLocalText('');
+      setLocalScript('');
     }
   }, [selectedObject]);
 
@@ -68,6 +72,11 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpd
       }
     }
   };
+
+  // Hide the panel completely if in run mode
+  if (isRunMode) {
+    return null;
+  }
 
   return (
     <Box sx={{ borderLeft: '1px solid #ddd', height: '100vh', p: 2 }}>
@@ -131,7 +140,20 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpd
               endAdornment: <InputAdornment position="end">px</InputAdornment>,
             }}
           />
-          {/* Add more properties here later */}
+          {/* Script field */}
+          {selectedObject.type === 'button' && (
+            <TextField
+              label="Script (JavaScript)"
+              multiline
+              rows={4}
+              value={localScript}
+              onChange={(e) => setLocalScript(e.target.value)}
+              onBlur={(e) => handlePropertyChange('script', e.target.value)}
+              fullWidth
+              size="small"
+              placeholder="Enter JavaScript code here..."
+            />
+          )}
         </Box>
       ) : (
         <Typography variant="body2" color="text.secondary">

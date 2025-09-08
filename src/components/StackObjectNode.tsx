@@ -7,9 +7,12 @@ interface StackObjectNodeProps {
   isSelected: boolean;
   onSelect: () => void;
   onUpdateObject: (object: StackObject) => void;
+  isRunMode: boolean;
+  onSwitchCard: (cardId: string) => void;
+  onOpenUrl: (url: string) => void;
 }
 
-const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSelected, onSelect, onUpdateObject }) => {
+const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSelected, onSelect, onUpdateObject, isRunMode, onSwitchCard, onOpenUrl }) => {
   const shapeRef = useRef<any>();
   const trRef = useRef<any>();
 
@@ -35,14 +38,10 @@ const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSelected, o
   };
 
   const handleTransformEnd = (e: any) => {
-    // transformer is changing scale of the node
-    // and as the result the node's width and height are changing
-    // find new width and height
     const node = shapeRef.current;
     const scaleX = node.scaleX();
     const scaleY = node.scaleY();
 
-    // reset scale back to 1
     node.scaleX(1);
     node.scaleY(1);
 
@@ -55,6 +54,23 @@ const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSelected, o
     });
   };
 
+  const handleClick = () => {
+    if (isRunMode) {
+      if (object.type === 'button') {
+        if (object.action === 'jumpToCard' && object.jumpToCardId) {
+          onSwitchCard(object.jumpToCardId);
+        } else if (object.action === 'openUrl' && object.src) { // Assuming object.src can be a URL for buttons
+          onOpenUrl(object.src);
+        } else if (object.script) {
+          // This will be handled in the next sub-task (custom script execution)
+          console.log('Custom script execution triggered:', object.script);
+        }
+      }
+    } else { // Edit mode
+      onSelect();
+    }
+  };
+
   return (
     <React.Fragment>
       <Group
@@ -62,9 +78,9 @@ const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSelected, o
         y={y}
         width={width}
         height={height}
-        onClick={onSelect}
-        onTap={onSelect}
-        draggable
+        onClick={handleClick} // Use the new handleClick
+        onTap={handleClick} // Use the new handleClick
+        draggable={!isRunMode} // Only draggable in edit mode
         onDragEnd={handleDragEnd}
         onTransformEnd={handleTransformEnd}
         ref={shapeRef}

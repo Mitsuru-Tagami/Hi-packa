@@ -6,6 +6,7 @@ import type { Stack, StackObject } from './types';
 function App() {
   const [stack, setStack] = useState<Stack>(initialStack);
   const [selectedObject, setSelectedObject] = useState<StackObject | null>(null);
+  const [isRunMode, setIsRunMode] = useState<boolean>(false);
 
   const handleSwitchCard = (cardId: string) => {
     // When switching cards, also deselect any selected object
@@ -44,13 +45,28 @@ function App() {
     }
   };
 
+  const toggleRunMode = () => {
+    setIsRunMode(prev => !prev);
+    // When entering run mode, deselect any object
+    if (!isRunMode) {
+      setSelectedObject(null);
+    }
+  };
+
+  const handleOpenUrl = (url: string) => {
+    window.open(url, '_blank');
+  };
+
   return (
     <Layout
       stack={stack}
       selectedObject={selectedObject}
+      isRunMode={isRunMode}
       onSwitchCard={handleSwitchCard}
       onSelectObject={handleSelectObject}
       onUpdateObject={handleUpdateObject}
+      onToggleRunMode={toggleRunMode}
+      onOpenUrl={handleOpenUrl} // Pass onOpenUrl
     />
   );
 }
