@@ -115,3 +115,62 @@ HyperCardの思想を現代のWeb技術で再実装し、誰もが直感的に�
 *   **ユーザーのプライバシー保護:** ユーザーが作成したデータは開発者側では一切保持しないため、プライバシーが完全に保護される。
 *   **ポータビリティ:** ユーザーは書き出したHTMLファイルをWebサーバーにアップロードしたり、メールで送ったりと、自由に配布・利用できる。
 *   **HyperCardの思想の継承:** 個人のコンピュータ内で創造的な作業が完結するという、オリジナルのHyperCardが持っていた思想をWeb上で再現する。
+
+---
+
+### **6. ライブラリ導入とReactへの移行手順**
+
+現在のDOMベースの実装から、UI構築の効率化と将来の拡張性向上のため、ReactおよびUIライブラリ（Material-UI, Konva.js）を導入します。以下にその手順を示します。
+
+**ステップ1: 必要なライブラリのインストール**
+
+まず、開発に必要なライブラリをnpmでインストールします。
+
+```bash
+# Reactと関連ライブラリ
+npm install react react-dom @types/react @types/react-dom
+
+# Material-UIと関連ライブラリ
+npm install @mui/material @emotion/react @emotion/styled
+
+# Konva.jsとReact用ラッパー
+npm install konva react-konva
+
+# Vite用のReactプラグイン (開発依存)
+npm install -D @vitejs/plugin-react
+```
+
+**ステップ2: Vite設定の更新**
+
+`vite.config.js` を編集し、Reactをプロジェクトで利用できるように設定します。
+
+*   `@vitejs/plugin-react` をインポートします。
+*   `plugins` 配列に `react()` を追加します。
+
+**ステップ3: プロジェクト構造のReact化**
+
+1.  **エントリーポイントの変更:**
+    *   `src/main.ts` を `src/main.tsx` にリネームします。
+    *   `index.html` の `<script>` タグの `src` 属性を `/src/main.tsx` に更新します。
+
+2.  **Appコンポーネントの作成:**
+    *   `src/App.tsx` を新規作成します。これがアプリケーションのルートコンポーネントになります。
+    *   `main.tsx` の中身を、この `App.tsx` をレンダリングする定型コードに置き換えます。
+
+**ステップ4: UIコンポーネントの作成とレイアウト構築**
+
+仕様書に基づき、UIを構成する主要なReactコンポーネントの雛形を作成します。
+
+1.  `src/components` ディレクトリを作成します。
+2.  以下のコンポーネントファイルを作成します。
+    *   `Layout.tsx`: Material-UIの `Box` や `Grid` を用いて、全体の3カラムレイアウト（カード一覧、メインキャンバス、プロパティパネル）を構築します。
+    *   `CardCanvas.tsx`: `react-konva` を用いて、Konvaの `Stage` と `Layer` を配置するキャンバス領域を作成します。既存のオブジェクト描画ロジックの移行先となります。
+    *   `CardListPanel.tsx`: カード一覧を表示するパネルです。既存のカードリスト表示ロジックの移行先となります。
+    *   `PropertiesPanel.tsx`: 選択されたオブジェクトのプロパティを編集するパネルです。既存のプロパティパネル更新ロジックの移行先となります。
+
+**ステップ5: 既存ロジックの段階的な移行**
+
+現在の `main.ts` に書かれている状態管理や描画ロジックを、新しく作成したReactコンポーネントへ段階的に移行していきます。
+
+*   **状態管理:** `stack` や `selectedObject` などの状態は、Reactの `useState` やコンテキストを用いて管理するように変更します。
+*   **描画ロジック:** `renderAll` や `createDOMElement` などの関数は、各コンポーネントのJSX内に置き換えられます。`interact.js` による操作も、Reactのイベントハンドリングや `useEffect` フックと統合します。
