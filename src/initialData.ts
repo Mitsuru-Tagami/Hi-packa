@@ -140,6 +140,8 @@ export const initialStack: Stack = {
           script: '',
         },
       ],
+      width: 414,
+      height: 736,
     },
     // 2. Win Card
     {
@@ -177,6 +179,8 @@ export const initialStack: Stack = {
           color: '#333333',
         },
       ],
+      width: 414,
+      height: 736,
     },
     // 3. Lose Card
     {
@@ -209,6 +213,8 @@ export const initialStack: Stack = {
           color: '#333333',
         },
       ],
+      width: 414,
+      height: 736,
     },
   ],
   currentCardId: gameCardId,

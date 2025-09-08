@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import CardListPanel from './CardListPanel';
 import CardCanvas from './CardCanvas';
-import PropertiesPanel from './PropertiesPanel';
+import { PropertiesPanel } from './PropertiesPanel';
 import SettingsModal from './SettingsModal';
 import type { Stack, StackObject, ObjectType } from '../types'; // Import ObjectType
 
@@ -23,6 +23,8 @@ interface LayoutProps {
   onCloseSettingsModal: () => void;
   onSetMagicEnabled: (enabled: boolean) => void;
   onAddObject: (type: ObjectType, x: number, y: number) => void; // New prop
+  onDeleteObject: (objectId: string) => void; // New prop
+  onUpdateCardDimensions: (cardId: string, width: number, height: number) => void; // New prop
 }
 
 const Layout: React.FC<LayoutProps> = ({
@@ -40,8 +42,12 @@ const Layout: React.FC<LayoutProps> = ({
   onOpenSettingsModal,
   onCloseSettingsModal,
   onSetMagicEnabled,
-  onAddObject, // Destructure new prop
+  onAddObject, // Add this line
+  onDeleteObject,
+  onUpdateCardDimensions, // Add this line
 }) => {
+  const currentCard = stack.cards.find(card => card.id === stack.currentCardId);
+
   return (
     <Box sx={{ flexGrow: 1, height: '100%' }}>
       <Grid container spacing={2} sx={{ height: '100%' }}>
@@ -73,6 +79,9 @@ const Layout: React.FC<LayoutProps> = ({
             onUpdateObject={onUpdateObject}
             isRunMode={isRunMode}
             isMagicEnabled={isMagicEnabled}
+            onDeleteObject={onDeleteObject} // Pass new prop
+            onUpdateCardDimensions={onUpdateCardDimensions} // Pass new prop
+            currentCard={currentCard} // Pass currentCard
           />
         </Grid>
       </Grid>

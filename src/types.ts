@@ -33,6 +33,8 @@ export type Card = {
   id: string;
   name: string;
   objects: StackObject[];
+  width: number;
+  height: number;
 };
 
 export type Stack = {

@@ -9,6 +9,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControlLabel from '@mui/material/FormControlLabel'; // Import FormControlLabel
 import Switch from '@mui/material/Switch'; // Import Switch
+import Button from '@mui/material/Button'; // Import Button
 import type { StackObject, BorderWidth, TextAlign } from '../types';
 import { parseUnitValue } from '../utils';
 
@@ -17,9 +18,12 @@ interface PropertiesPanelProps {
   onUpdateObject: (object: StackObject) => void;
   isRunMode: boolean;
   isMagicEnabled: boolean;
+  onDeleteObject: (objectId: string) => void;
+  onUpdateCardDimensions: (cardId: string, width: number, height: number) => void; // New prop
+  currentCard: Card | null; // New prop
 }
 
-const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpdateObject, isRunMode, isMagicEnabled }) => {
+export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpdateObject, isRunMode, isMagicEnabled, onDeleteObject, onUpdateCardDimensions, currentCard }) => {
   // Local state to manage input field values
   const [localX, setLocalX] = useState<string>('');
   const [localY, setLocalY] = useState<string>('');
@@ -35,6 +39,9 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpd
   const [localSrc, setLocalSrc] = useState<string>(''); // New local state for image source
   const [localObjectFit, setLocalObjectFit] = useState<'contain' | 'fill'>('contain'); // New local state for object fit
   const [isTransparentBackground, setIsTransparentBackground] = useState<boolean>(false); // New local state for transparency
+  const [localCardWidth, setLocalCardWidth] = useState<string>(''); // New local state for card width
+  const [localCardHeight, setLocalCardHeight] = useState<string>(''); // New local state for card height
+  const [selectedSizeLabel, setSelectedSizeLabel] = useState<string>(''); // New state for selected predefined size
 
   // Update local state when selectedObject changes
   useEffect(() => {
@@ -73,8 +80,18 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpd
       setLocalTextAlign('left');
       setLocalBackgroundColor('');
       setIsTransparentBackground(false);
+      // Initialize card dimensions
+      if (currentCard) {
+                setLocalCardHeight(currentCard.height.toString());
+                const matchedSize = PREDEFINED_CARD_SIZES.find(
+                  size => size.width === currentCard.width && size.height === currentCard.height
+                );
+                setSelectedSizeLabel(matchedSize ? matchedSize.label : 'Custom');      } else {
+        setLocalCardWidth('');
+        setLocalCardHeight('');
+      }
     }
-  }, [selectedObject]);
+  }, [selectedObject, currentCard]);
 
   const handlePropertyChange = (key: keyof StackObject, value: any) => {
     if (selectedObject) {
@@ -123,11 +140,18 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpd
     }
   };
 
+  const PREDEFINED_CARD_SIZES = [
+    { label: 'iPhone 8 Plus (414x736)', width: 414, height: 736 },
+    { label: 'iPhone 12/13 (390x844)', width: 390, height: 844 },
+    { label: 'iPad (768x1024)', width: 768, height: 1024 },
+    { label: 'Desktop (1280x720)', width: 1280, height: 720 },
+    { label: 'Custom', width: 0, height: 0 }, // Placeholder for custom input
+  ];
+  
   // Hide the panel completely if in run mode
   if (isRunMode) {
     return null;
   }
-
   return (
     <Box sx={{ borderLeft: '1px solid #ddd', p: 2 }}>
       <Typography variant="h6" gutterBottom>
@@ -320,14 +344,104 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpd
               disabled={!isMagicEnabled} // Disable if magic is not enabled
             />
           )}
+
+          {/* Delete Button */}
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => {
+              if (selectedObject && window.confirm(`Delete ${selectedObject.type} (${selectedObject.id})? This action cannot be undone.`)) {
+                onDeleteObject(selectedObject.id);
+              }
+            }}
+            sx={{ mt: 3 }} // Margin top for spacing
+            className="delete-btn" // Apply the CSS class
+          >
+            Delete Object
+          </Button>
         </Box>
       ) : (
-        <Typography variant="body2" color="text.secondary">
-          Select an object on the canvas to view its properties.
-        </Typography>
+        // UI for card properties when no object is selected
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Typography variant="subtitle1">
+            Card Properties: {currentCard?.name} ({currentCard?.id})
+          </Typography>
+
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="card-size-select-label">Card Size</InputLabel>
+            <Select
+              labelId="card-size-select-label"
+              value={selectedSizeLabel}
+              label="Card Size"
+              onChange={(e) => {
+                const newLabel = e.target.value;
+                setSelectedSizeLabel(newLabel);
+                if (newLabel === 'Custom') {
+                  // User will manually enter width/height if Custom is selected
+                  // For now, do nothing, or clear inputs if desired
+                } else {
+                  const selectedSize = PREDEFINED_CARD_SIZES.find(size => size.label === newLabel);
+                  if (selectedSize && currentCard) {
+                    onUpdateCardDimensions(currentCard.id, selectedSize.width, selectedSize.height);
+                  }
+                }
+              }}
+            >
+              {PREDEFINED_CARD_SIZES.map((size) => (
+                <MenuItem key={size.label} value={size.label}>
+                  {size.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* Show manual input fields only if 'Custom' is selected */}
+          {selectedSizeLabel === 'Custom' && (
+            <>
+              <TextField
+                label="Custom Width"
+                value={localCardWidth}
+                onChange={(e) => setLocalCardWidth(e.target.value)}
+                onBlur={(e) => {
+                  if (currentCard) {
+                    const newWidth = parseInt(e.target.value);
+                    if (!isNaN(newWidth)) {
+                      onUpdateCardDimensions(currentCard.id, newWidth, currentCard.height);
+                    } else {
+                      setLocalCardWidth(currentCard.width.toString()); // Revert on invalid input
+                    }
+                  }
+                }}
+                fullWidth
+                size="small"
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">px</InputAdornment>,
+                }}
+              />
+              <TextField
+                label="Custom Height"
+                value={localCardHeight}
+                onChange={(e) => setLocalCardHeight(e.target.value)}
+                onBlur={(e) => {
+                  if (currentCard) {
+                    const newHeight = parseInt(e.target.value);
+                    if (!isNaN(newHeight)) {
+                      onUpdateCardDimensions(currentCard.id, currentCard.width, newHeight);
+                    } else {
+                      setLocalCardHeight(currentCard.height.toString()); // Revert on invalid input
+                    }
+                  }
+                }}
+                fullWidth
+                size="small"
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">px</InputAdornment>,
+                }}
+              />
+            </>
+          )}
+        </Box>
       )}
     </Box>
   );
 };
-
-export default PropertiesPanel;

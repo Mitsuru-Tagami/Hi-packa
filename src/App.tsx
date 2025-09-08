@@ -155,6 +155,47 @@ function App() {
     });
   };
 
+  const handleDeleteObject = (objectId: string) => {
+    setStack(prevStack => {
+      const newCards = prevStack.cards.map(card => {
+        if (card.id === prevStack.currentCardId) {
+          return {
+            ...card,
+            objects: card.objects.filter(obj => obj.id !== objectId),
+          };
+        }
+        return card;
+      });
+      return {
+        ...prevStack,
+        cards: newCards,
+      };
+    });
+    // Deselect the object if it was the one deleted
+    if (selectedObject?.id === objectId) {
+      setSelectedObject(null);
+    }
+  };
+
+  const handleUpdateCardDimensions = (cardId: string, width: number, height: number) => {
+    setStack(prevStack => {
+      const newCards = prevStack.cards.map(card => {
+        if (card.id === cardId) {
+          return {
+            ...card,
+            width,
+            height,
+          };
+        }
+        return card;
+      });
+      return {
+        ...prevStack,
+        cards: newCards,
+      };
+    });
+  };
+
   return (
     <Layout
       stack={stack}
@@ -172,6 +213,8 @@ function App() {
       onCloseSettingsModal={closeSettingsModal}
       onSetMagicEnabled={setIsMagicEnabled}
       onAddObject={handleAddObject}
+      onDeleteObject={handleDeleteObject}
+      onUpdateCardDimensions={handleUpdateCardDimensions}
     />
   );
 }

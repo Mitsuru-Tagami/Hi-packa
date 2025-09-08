@@ -61,8 +61,8 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   return (
     <React.Fragment>
       <Stage
-        width={window.innerWidth * 0.5}
-        height={window.innerHeight}
+        width={currentCard?.width || 414}
+        height={currentCard?.height || 736}
         onContextMenu={handleContextMenu} // Add context menu handler
       >
         <Layer>
@@ -70,8 +70,8 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
           <Rect
             x={0}
             y={0}
-            width={window.innerWidth * 0.5}
-            height={window.innerHeight}
+            width={currentCard?.width || 414}
+            height={currentCard?.height || 736}
             fill="#f0f0f0"
             onClick={() => !isRunMode && onSelectObject(null)}
           />

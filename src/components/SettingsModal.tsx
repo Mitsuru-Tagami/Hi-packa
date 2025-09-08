@@ -5,6 +5,12 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
+import Select from '@mui/material/Select';
+import type { SelectChangeEvent } from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import i18next from '../i18n';
 import IconButton from '@mui/material/IconButton'; // Import IconButton
 import InputAdornment from '@mui/material/InputAdornment'; // Import InputAdornment
 import Visibility from '@mui/icons-material/Visibility'; // Import Visibility icon
@@ -32,6 +38,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSetMag
   const [magicInput, setMagicInput] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false); // New state for password visibility
+  const [selectedLanguage, setSelectedLanguage] = useState(i18next.language); // New state for language
   const MAGIC_WORD = 'Magic'; // Define the magic word
 
   const handleUnlock = () => {
@@ -42,6 +49,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSetMag
     } else {
       setError('Incorrect magic word.');
     }
+  };
+
+  const handleLanguageChange = (event: SelectChangeEvent<string>) => {
+    const newLang = event.target.value;
+    i18next.changeLanguage(newLang);
+    setSelectedLanguage(newLang);
   };
 
   const handleClose = () => {
@@ -70,6 +83,21 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSetMag
         <Typography id="settings-modal-title" variant="h6" component="h2" gutterBottom>
           Settings
         </Typography>
+
+        {/* Language Selector */}
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="language-select-label">Language</InputLabel>
+          <Select
+            labelId="language-select-label"
+            value={selectedLanguage}
+            label="Language"
+            onChange={handleLanguageChange}
+          >
+            <MenuItem value="ja">日本語</MenuItem>
+            <MenuItem value="en">English</MenuItem>
+          </Select>
+        </FormControl>
+
         <Typography id="settings-modal-description" sx={{ mt: 2 }}>
           Enter the magic word to unlock advanced scripting features.
         </Typography>
