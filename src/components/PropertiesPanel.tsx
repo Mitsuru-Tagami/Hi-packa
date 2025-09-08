@@ -1,6 +1,6 @@
 import React from 'react';
 import Box from '@mui/material/Box';
-import { StackObject } from '../types';
+import type { StackObject } from '../types';
 
 interface PropertiesPanelProps {
   selectedObject: StackObject | null;

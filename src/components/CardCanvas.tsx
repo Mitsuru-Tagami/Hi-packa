@@ -1,6 +1,6 @@
 import React from 'react';
 import { Stage, Layer, Rect, Text } from 'react-konva';
-import { Stack } from '../types';
+import type { Stack } from '../types';
 
 interface CardCanvasProps {
   stack: Stack;

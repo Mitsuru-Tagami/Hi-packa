@@ -1,19 +1,29 @@
 import React from 'react';
 import Box from '@mui/material/Box';
-import { Stack } from '../types';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
+import type { Stack } from '../types';
 
 interface CardListPanelProps {
   stack: Stack;
+  onSwitchCard: (cardId: string) => void;
 }
 
-const CardListPanel: React.FC<CardListPanelProps> = ({ stack }) => {
-  // For now, just log the received data
-  console.log('CardListPanel received stack:', stack);
-
+const CardListPanel: React.FC<CardListPanelProps> = ({ stack, onSwitchCard }) => {
   return (
-    <Box sx={{ border: '1px solid grey', height: '100vh' }}>
-      Card List Panel
-      {/* We will render the list of cards here in the next step */}
+    <Box sx={{ borderRight: '1px solid #ddd', height: '100vh' }}>
+      <List component="nav">
+        {stack.cards.map((card, index) => (
+          <ListItemButton
+            key={card.id}
+            selected={card.id === stack.currentCardId}
+            onClick={() => onSwitchCard(card.id)}
+          >
+            <ListItemText primary={`${index + 1}. ${card.name}`} />
+          </ListItemButton>
+        ))}
+      </List>
     </Box>
   );
 };

@@ -1,4 +1,4 @@
-import { Stack } from './types';
+import type { Stack } from './types';
 
 const gameCardId = 'card-janken-main';
 const winCardId = 'card-janken-win';
