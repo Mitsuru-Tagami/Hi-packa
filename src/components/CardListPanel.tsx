@@ -6,6 +6,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import type { Stack } from '../types';
+import { t } from '../i18n'; // Import translation function
 
 interface CardListPanelProps {
   stack: Stack;
@@ -19,7 +20,7 @@ const CardListPanel: React.FC<CardListPanelProps> = ({ stack, onSwitchCard, isRu
   return (
     <Box sx={{ borderRight: '1px solid #ddd', height: '100vh', p: 2 }}>
       <Typography variant="h6" gutterBottom>
-        Cards
+        {t('cards')}
       </Typography>
       <List component="nav">
         {stack.cards.map((card, index) => (
@@ -35,14 +36,14 @@ const CardListPanel: React.FC<CardListPanelProps> = ({ stack, onSwitchCard, isRu
       </List>
       <Box sx={{ mt: 3 }}>
         <Typography variant="h6" gutterBottom>
-          Mode
+          {t('mode')}
         </Typography>
         <Button
           variant="contained"
           onClick={onToggleRunMode}
           fullWidth
         >
-          {isRunMode ? 'Edit Mode' : 'Run Mode'}
+          {isRunMode ? t('editMode') : t('runMode')}
         </Button>
       </Box>
       <Box sx={{ mt: 2 }}> {/* Added margin top for spacing */}
@@ -51,7 +52,7 @@ const CardListPanel: React.FC<CardListPanelProps> = ({ stack, onSwitchCard, isRu
           onClick={onOpenSettingsModal}
           fullWidth
         >
-          Settings
+          {t('settings')}
         </Button>
       </Box>
       {/* Add other controls like "Export HTML" here later */}
