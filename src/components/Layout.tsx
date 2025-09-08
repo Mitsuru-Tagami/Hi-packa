@@ -43,9 +43,9 @@ const Layout: React.FC<LayoutProps> = ({
   onAddObject, // Destructure new prop
 }) => {
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Grid container spacing={2}>
-        <Grid item xs={3}>
+    <Box sx={{ flexGrow: 1, height: '100%' }}>
+      <Grid container spacing={2} sx={{ height: '100%' }}>
+        <Grid item xs={3} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
           <CardListPanel
             stack={stack}
             onSwitchCard={onSwitchCard}
@@ -54,7 +54,7 @@ const Layout: React.FC<LayoutProps> = ({
             onOpenSettingsModal={onOpenSettingsModal}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={6} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
           <CardCanvas
             stack={stack}
             selectedObject={selectedObject}
@@ -67,7 +67,7 @@ const Layout: React.FC<LayoutProps> = ({
             onAddObject={onAddObject} // Pass to CardCanvas
           />
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={3} sx={{ height: '100%', overflow: 'auto' }}>
           <PropertiesPanel
             selectedObject={selectedObject}
             onUpdateObject={onUpdateObject}

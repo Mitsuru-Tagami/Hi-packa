@@ -123,7 +123,7 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpd
   }
 
   return (
-    <Box sx={{ borderLeft: '1px solid #ddd', height: '100vh', p: 2 }}>
+    <Box sx={{ borderLeft: '1px solid #ddd', p: 2 }}>
       <Typography variant="h6" gutterBottom>
         Properties Panel
       </Typography>
