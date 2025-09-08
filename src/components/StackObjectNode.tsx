@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from 'react';
-import { Group, Rect, Text, Transformer } from 'react-konva';
+import React, { useRef, useState, useEffect } from 'react';
+import { Group, Rect, Text, Transformer, Image } from 'react-konva';
 import type { StackObject, BorderWidth } from '../types';
 
 interface StackObjectNodeProps {
@@ -24,6 +24,24 @@ const borderWidthMap: Record<BorderWidth, number> = {
 export const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSelected, onSelect, onUpdateObject, isRunMode, onSwitchCard, onOpenUrl, executeScript }) => {
   const shapeRef = useRef<any>();
   const trRef = useRef<any>();
+
+  const [img, setImg] = useState<HTMLImageElement | undefined>(undefined);
+
+  useEffect(() => {
+    if (object.type === 'image' && object.src) {
+      const newImg = new window.Image();
+      newImg.src = object.src;
+      newImg.onload = () => {
+        setImg(newImg);
+      };
+      newImg.onerror = () => {
+        setImg(undefined); // Clear image on error
+        console.error('Failed to load image:', object.src);
+      };
+    } else {
+      setImg(undefined);
+    }
+  }, [object.type, object.src]);
 
   useEffect(() => {
     if (isSelected) {
@@ -88,6 +106,26 @@ export const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSele
     }
   };
 
+  let imageX = 0;
+  let imageY = 0;
+  let imageWidth = width;
+  let imageHeight = height;
+
+  if (object.type === 'image' && img && object.objectFit === 'contain') {
+    const aspectRatio = img.width / img.height;
+    const containerAspectRatio = width / height;
+
+    if (aspectRatio > containerAspectRatio) {
+      imageWidth = width;
+      imageHeight = width / aspectRatio;
+      imageY = (height - imageHeight) / 2;
+    } else {
+      imageHeight = height;
+      imageWidth = height * aspectRatio;
+      imageX = (width - imageWidth) / 2;
+    }
+  }
+
   return (
     <React.Fragment>
       <Group
@@ -124,6 +162,17 @@ export const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSele
           fill={object.color || '#000'}
           textDecoration={rest.textDecoration}
         />
+
+        {/* Render image content */}
+        {object.type === 'image' && img && (
+          <Image
+            image={img}
+            x={imageX}
+            y={imageY}
+            width={imageWidth}
+            height={imageHeight}
+          />
+        )}
         {/* We can add type-specific renderings here later (e.g., for images) */}
       </Group>
       {isSelected && (

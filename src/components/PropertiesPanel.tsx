@@ -31,6 +31,9 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpd
   const [localBorderWidth, setLocalBorderWidth] = useState<BorderWidth>('none');
   const [localTextAlign, setLocalTextAlign] = useState<TextAlign>('left');
   const [localBackgroundColor, setLocalBackgroundColor] = useState<string>(''); // New local state for background color
+  const [localColor, setLocalColor] = useState<string>(''); // New local state for text color
+  const [localSrc, setLocalSrc] = useState<string>(''); // New local state for image source
+  const [localObjectFit, setLocalObjectFit] = useState<'contain' | 'fill'>('contain'); // New local state for object fit
   const [isTransparentBackground, setIsTransparentBackground] = useState<boolean>(false); // New local state for transparency
 
   // Update local state when selectedObject changes
@@ -45,6 +48,9 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpd
       setLocalBorderColor(selectedObject.borderColor || '#000000');
       setLocalBorderWidth(selectedObject.borderWidth || 'none');
       setLocalTextAlign(selectedObject.textAlign || 'left');
+      setLocalColor(selectedObject.color || '#000000'); // Default to black if not set
+      setLocalSrc(selectedObject.src || '');
+      setLocalObjectFit(selectedObject.objectFit || 'contain');
 
       // Initialize background color and transparency
       if (selectedObject.backgroundColor === 'transparent' || selectedObject.backgroundColor === 'rgba(0,0,0,0)') {
@@ -133,7 +139,11 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpd
             Selected Object: {selectedObject.id} ({selectedObject.type})
           </Typography>
           <TextField
-            label="Text"
+            label={
+              selectedObject.type === 'text' || selectedObject.type === 'button'
+                ? 'Text'
+                : 'Label'
+            }
             value={localText}
             onChange={(e) => setLocalText(e.target.value)}
             onBlur={(e) => handlePropertyChange('text', e.target.value)}
@@ -158,6 +168,21 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpd
                 <MenuItem value="justify">Justify</MenuItem>
               </Select>
             </FormControl>
+          )}
+
+          {/* Text Color */}
+          {(selectedObject.type === 'text' || selectedObject.type === 'button') && (
+            <TextField
+              label="Text Color"
+              type="color"
+              value={localColor}
+              onChange={(e) => {
+                setLocalColor(e.target.value);
+                handlePropertyChange('color', e.target.value);
+              }}
+              fullWidth
+              size="small"
+            />
           )}
 
           <TextField
@@ -204,6 +229,35 @@ const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpd
               endAdornment: <InputAdornment position="end">px</InputAdornment>,
             }}
           />
+
+          {/* Image Properties */}
+          {selectedObject.type === 'image' && (
+            <>
+              <TextField
+                label="Image Source (URL)"
+                value={localSrc}
+                onChange={(e) => setLocalSrc(e.target.value)}
+                onBlur={(e) => handlePropertyChange('src', e.target.value)}
+                fullWidth
+                size="small"
+              />
+              <FormControl fullWidth size="small">
+                <InputLabel>Object Fit</InputLabel>
+                <Select
+                  value={localObjectFit}
+                  label="Object Fit"
+                  onChange={(e) => {
+                    setLocalObjectFit(e.target.value as 'contain' | 'fill');
+                    handlePropertyChange('objectFit', e.target.value as 'contain' | 'fill');
+                  }}
+                >
+                  <MenuItem value="contain">Contain</MenuItem>
+                  <MenuItem value="fill">Fill</MenuItem>
+                </Select>
+              </FormControl>
+            </>
+          )}
+
           {/* Background Color */}
           <TextField
             label="Background Color"
