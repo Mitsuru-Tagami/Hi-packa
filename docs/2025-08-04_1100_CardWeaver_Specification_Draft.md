@@ -164,9 +164,9 @@ npm install -D @vitejs/plugin-react
 1.  `src/components` ディレクトリを作成します。
 2.  以下のコンポーネントファイルを作成します。
     *   `Layout.tsx`: Material-UIの `Box` や `Grid` を用いて、全体の3カラムレイアウト（カード一覧、メインキャンバス、プロパティパネル）を構築します。
-    *   `CardCanvas.tsx`: `react-konva` を用いて、Konvaの `Stage` と `Layer` を配置するキャンバス領域を作成します。既存のオブジェクト描画ロジックの移行先となります。
-    *   `CardListPanel.tsx`: カード一覧を表示するパネルです。既存のカードリスト表示ロジックの移行先となります。
-    *   `PropertiesPanel.tsx`: 選択されたオブジェクトのプロパティを編集するパネルです。既存のプロパティパネル更新ロジックの移行先となります。
+    *   `CardCanvas.tsx`: `react-konva` を用いて、Konvaの `Stage` と `Layer` を配置するキャンバス領域を作成します。
+    *   `CardListPanel.tsx`: カード一覧を表示するパネルです。
+    *   `PropertiesPanel.tsx`: 選択されたオブジェクトのプロパティを編集するパネルです。
 
 **ステップ5: 既存ロジックの段階的な移行**
 
@@ -174,3 +174,10 @@ npm install -D @vitejs/plugin-react
 
 *   **状態管理:** `stack` や `selectedObject` などの状態は、Reactの `useState` やコンテキストを用いて管理するように変更します。
 *   **描画ロジック:** `renderAll` や `createDOMElement` などの関数は、各コンポーネントのJSX内に置き換えられます。`interact.js` による操作も、Reactのイベントハンドリングや `useEffect` フックと統合します。
+
+### **7. 将来の機能拡張**
+
+*   **操作の取り消し・やり直し (Undo/Redo):**
+    *   ユーザーの操作履歴を管理し、Ctrl+Z (取り消し) および Ctrl+Y (やり直し) で、直前の状態に戻したり進めたりできる機能。
+    *   実装には、アプリケーションの状態変化を記録・復元する仕組みが必要となり、複雑な設計が求められる。
+    *   今後の重要な機能として検討する。

@@ -10,9 +10,11 @@ interface LayoutProps {
   stack: Stack;
   selectedObject: StackObject | null;
   onSwitchCard: (cardId: string) => void;
+  onSelectObject: (object: StackObject | null) => void;
+  onUpdateObject: (object: StackObject) => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ stack, selectedObject, onSwitchCard }) => {
+const Layout: React.FC<LayoutProps> = ({ stack, selectedObject, onSwitchCard, onSelectObject, onUpdateObject }) => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={2}>
@@ -20,7 +22,12 @@ const Layout: React.FC<LayoutProps> = ({ stack, selectedObject, onSwitchCard }) 
           <CardListPanel stack={stack} onSwitchCard={onSwitchCard} />
         </Grid>
         <Grid item xs={6}>
-          <CardCanvas stack={stack} />
+          <CardCanvas
+            stack={stack}
+            selectedObject={selectedObject}
+            onSelectObject={onSelectObject}
+            onUpdateObject={onUpdateObject}
+          />
         </Grid>
         <Grid item xs={3}>
           <PropertiesPanel selectedObject={selectedObject} />
