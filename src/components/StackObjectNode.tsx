@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Group, Rect, Text, Transformer } from 'react-konva';
-import type { StackObject } from '../types';
+import type { StackObject, BorderWidth } from '../types';
 
 interface StackObjectNodeProps {
   object: StackObject;
@@ -10,9 +10,18 @@ interface StackObjectNodeProps {
   isRunMode: boolean;
   onSwitchCard: (cardId: string) => void;
   onOpenUrl: (url: string) => void;
+  executeScript: (script: string) => void;
 }
 
-const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSelected, onSelect, onUpdateObject, isRunMode, onSwitchCard, onOpenUrl }) => {
+// Mapping for BorderWidth to pixel values
+const borderWidthMap: Record<BorderWidth, number> = {
+  none: 0,
+  thin: 1,
+  medium: 2,
+  thick: 4,
+};
+
+export const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSelected, onSelect, onUpdateObject, isRunMode, onSwitchCard, onOpenUrl, executeScript }) => {
   const shapeRef = useRef<any>();
   const trRef = useRef<any>();
 
@@ -26,8 +35,17 @@ const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSelected, o
 
   const { x, y, width, height, type, text, ...rest } = object;
 
-  const strokeColor = isSelected ? 'blue' : '#000000';
-  const strokeWidth = isSelected ? 3 : 1;
+  // Use object.borderColor if available, otherwise default to black
+  const currentStrokeColor = object.borderColor || '#000000';
+  // Use object.borderWidth if available, otherwise default to 'none'
+  const currentStrokeWidth = borderWidthMap[object.borderWidth || 'none'];
+
+  // Highlight color/width if selected
+  const strokeColor = isSelected ? 'blue' : currentStrokeColor;
+  const strokeWidth = isSelected ? 3 : currentStrokeWidth;
+
+  // Determine fill color based on object.backgroundColor
+  const fillColor = object.backgroundColor === 'transparent' ? 'rgba(0,0,0,0)' : (object.backgroundColor || '#ffffff');
 
   const handleDragEnd = (e: any) => {
     onUpdateObject({
@@ -59,11 +77,10 @@ const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSelected, o
       if (object.type === 'button') {
         if (object.action === 'jumpToCard' && object.jumpToCardId) {
           onSwitchCard(object.jumpToCardId);
-        } else if (object.action === 'openUrl' && object.src) { // Assuming object.src can be a URL for buttons
+        } else if (object.action === 'openUrl' && object.src) {
           onOpenUrl(object.src);
         } else if (object.script) {
-          // This will be handled in the next sub-task (custom script execution)
-          console.log('Custom script execution triggered:', object.script);
+          executeScript(object.script);
         }
       }
     } else { // Edit mode
@@ -78,9 +95,9 @@ const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSelected, o
         y={y}
         width={width}
         height={height}
-        onClick={handleClick} // Use the new handleClick
-        onTap={handleClick} // Use the new handleClick
-        draggable={!isRunMode} // Only draggable in edit mode
+        onClick={handleClick}
+        onTap={handleClick}
+        draggable={!isRunMode}
         onDragEnd={handleDragEnd}
         onTransformEnd={handleTransformEnd}
         ref={shapeRef}
@@ -89,7 +106,7 @@ const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSelected, o
         <Rect
           width={width}
           height={height}
-          fill="#ffffff"
+          fill={fillColor} // Use dynamic fillColor
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         />
@@ -104,7 +121,7 @@ const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSelected, o
           fontSize={Number(rest.fontSize?.replace('px', '')) || 16}
           fontStyle={rest.fontStyle}
           fontFamily={rest.fontFamily || 'sans-serif'}
-          fill={rest.color || '#000'}
+          fill={object.color || '#000'}
           textDecoration={rest.textDecoration}
         />
         {/* We can add type-specific renderings here later (e.g., for images) */}
@@ -124,5 +141,3 @@ const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSelected, o
     </React.Fragment>
   );
 };
-
-export default StackObjectNode;

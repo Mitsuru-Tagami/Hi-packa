@@ -6,8 +6,6 @@ const loseCardId = 'card-janken-lose';
 
 // This is the script that will be shared by the three choice buttons.
 // We pass the player's choice as an argument.
-// NOTE: This script relies on global functions like `switchCard` and a global `stack` variable.
-// This will need to be refactored when we implement the script execution logic in React.
 const playJankenScript = (playerChoice: 'rock' | 'paper' | 'scissors') => `
   const choices = ['rock', 'paper', 'scissors'];
   const computerChoice = choices[Math.floor(Math.random() * 3)];
@@ -20,26 +18,29 @@ const playJankenScript = (playerChoice: 'rock' | 'paper' | 'scissors') => `
 
   const outcome = getOutcome('${playerChoice}', computerChoice);
 
-  if (outcome === 'win') {
-    switchCard('${winCardId}');
-  } else if (outcome === 'lose') {
-    switchCard('${loseCardId}');
-  } else {
-    const currentCard = stack.cards.find(c => c.id === stack.currentCardId);
-    const resultText = currentCard.objects.find(o => o.id === 'obj-janken-result');
-    if (resultText) {
-      const choiceMap = {rock: 'ぐー', paper: 'ぱー', scissors: 'ちょき'};
-      resultText.text = 'あいこ！ (相手: ' + choiceMap[computerChoice] + ')';
-      // Clear the text after a while
+  const choiceMap = {rock: 'ぐー', paper: 'ぱー', scissors: 'ちょき'};
+  const resultTextId = 'obj-janken-result';
+  const computerChoiceTextId = 'obj-janken-computer-choice';
+
+  // Display computer's choice
+  updateObjectText(computerChoiceTextId, '相手は ' + choiceMap[computerChoice] + ' を出した！');
+
+  // Short delay before showing outcome
+  setTimeout(() => {
+    updateObjectText(computerChoiceTextId, ''); // Clear computer's choice
+
+    if (outcome === 'win') {
+      switchCard('${winCardId}');
+    } else if (outcome === 'lose') {
+      switchCard('${loseCardId}');
+    } else { // Draw
+      updateObjectText(resultTextId, 'あいこ！ (相手: ' + choiceMap[computerChoice] + ')');
+      // Clear the draw message after a while
       setTimeout(() => {
-        if (resultText.text.startsWith('あいこ')) { // Only clear if it's still the draw message
-          resultText.text = '';
-          renderAll();
-        }
+        updateObjectText(resultTextId, '');
       }, 1500);
-      renderAll();
     }
-  }
+  }, 1000); // 1 second delay
 `;
 
 export const initialStack: Stack = {
@@ -103,6 +104,18 @@ export const initialStack: Stack = {
           script: playJankenScript('paper'),
         },
         {
+          id: 'obj-janken-computer-choice', // New object for computer's choice
+          type: 'text',
+          x: 57, y: 450, width: 300, height: 40,
+          text: '',
+          textAlign: 'center',
+          fontSize: '20px',
+          fontWeight: 'bold',
+          color: '#666666',
+          borderWidth: 'none',
+          script: '',
+        },
+        {
           id: 'obj-janken-result',
           type: 'text',
           x: 57, y: 500, width: 300, height: 40,
@@ -160,7 +173,7 @@ export const initialStack: Stack = {
     // 3. Lose Card
     {
       id: loseCardId,
-      name: '負け...',
+      name: '負け...', 
       objects: [
         {
           id: 'obj-lose-title',

@@ -25,6 +25,8 @@ export type StackObject = {
   textDecoration?: 'none' | 'underline';
   color?: string;
   fontFamily?: string;
+  borderColor?: string;
+  backgroundColor?: string; // New property for background color
 };
 
 export type Card = {
