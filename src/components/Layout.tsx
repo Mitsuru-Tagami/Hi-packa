@@ -30,7 +30,7 @@ const Layout: React.FC<LayoutProps> = ({ stack, selectedObject, onSwitchCard, on
           />
         </Grid>
         <Grid item xs={3}>
-          <PropertiesPanel selectedObject={selectedObject} />
+          <PropertiesPanel selectedObject={selectedObject} onUpdateObject={onUpdateObject} />
         </Grid>
       </Grid>
     </Box>
