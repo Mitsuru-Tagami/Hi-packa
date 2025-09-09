@@ -54,6 +54,8 @@
     "newCardName": "Card {{number}}",
     "defaultButtonText": "Button",
     "defaultTextBoxText": "Text Box",
+    "newButton": "New Button",
+    "newTextBox": "New Text Box",
     "contextMenuAddButton": "Add Button",
     "contextMenuAddText": "Add Text",
     "contextMenuAddImage": "Add Image",
@@ -64,6 +66,24 @@
     "aiHelperText": "Ask AI for script ideas",
     "runMode": "Run",
     "editMode": "Edit",
-    "exportHtml": "Export HTML"
+    "exportHtml": "Export HTML",
+    "propertiesPanel": {
+      "title": "Properties Panel",
+      "selectedObjectLabel": "Selected Object: {{id}} ({{type}})",
+      "deleteButton": "Delete Object",
+      "deleteConfirmation": "Delete '{{type}} ({{id}})'? This action cannot be undone.",
+      "textLabel": "Text",
+      "labelLabel": "Label",
+      "textAlign": "Text Align",
+      "alignLeft": "Left",
+      "alignCenter": "Center",
+      "alignRight": "Right",
+      "alignJustify": "Justify",
+      "textColor": "Text Color",
+      "positionX": "X",
+      "positionY": "Y",
+      "width": "Width",
+      "height": "Height"
+    }
   }
 }

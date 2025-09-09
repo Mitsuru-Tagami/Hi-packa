@@ -10,8 +10,9 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControlLabel from '@mui/material/FormControlLabel'; // Import FormControlLabel
 import Switch from '@mui/material/Switch'; // Import Switch
 import Button from '@mui/material/Button'; // Import Button
-import type { StackObject, BorderWidth, TextAlign } from '../types';
+import type { StackObject, BorderWidth, TextAlign, Card } from '../types';
 import { parseUnitValue } from '../utils';
+import { t } from '../i18n';
 
 interface PropertiesPanelProps {
   selectedObject: StackObject | null;
@@ -155,19 +156,17 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
   return (
     <Box sx={{ borderLeft: '1px solid #ddd', p: 2 }}>
       <Typography variant="h6" gutterBottom>
-        Properties Panel
+        {t('propertiesPanel.title')}
       </Typography>
       {selectedObject ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Typography variant="subtitle1">
-            Selected Object: {selectedObject.id} ({selectedObject.type})
+            {t('propertiesPanel.selectedObjectLabel', { id: selectedObject.id, type: selectedObject.type })}
           </Typography>
           <TextField
-            label={
-              selectedObject.type === 'text' || selectedObject.type === 'button'
-                ? 'Text'
-                : 'Label'
-            }
+            label={selectedObject.type === 'text' || selectedObject.type === 'button'
+                ? t('propertiesPanel.textLabel')
+                : t('propertiesPanel.labelLabel')}
             value={localText}
             onChange={(e) => setLocalText(e.target.value)}
             onBlur={(e) => handlePropertyChange('text', e.target.value)}
@@ -177,19 +176,19 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
           {/* Text Align */}
           {(selectedObject.type === 'text' || selectedObject.type === 'button') && (
             <FormControl fullWidth size="small">
-              <InputLabel>Text Align</InputLabel>
+              <InputLabel>{t('propertiesPanel.textAlign')}</InputLabel>
               <Select
                 value={localTextAlign}
-                label="Text Align"
+                label={t('propertiesPanel.textAlign')}
                 onChange={(e) => {
                   setLocalTextAlign(e.target.value as TextAlign);
                   handlePropertyChange('textAlign', e.target.value as TextAlign);
                 }}
               >
-                <MenuItem value="left">Left</MenuItem>
-                <MenuItem value="center">Center</MenuItem>
-                <MenuItem value="right">Right</MenuItem>
-                <MenuItem value="justify">Justify</MenuItem>
+                <MenuItem value="left">{t('propertiesPanel.alignLeft')}</MenuItem>
+                <MenuItem value="center">{t('propertiesPanel.alignCenter')}</MenuItem>
+                <MenuItem value="right">{t('propertiesPanel.alignRight')}</MenuItem>
+                <MenuItem value="justify">{t('propertiesPanel.alignJustify')}</MenuItem>
               </Select>
             </FormControl>
           )}
@@ -197,7 +196,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
           {/* Text Color */}
           {(selectedObject.type === 'text' || selectedObject.type === 'button') && (
             <TextField
-              label="Text Color"
+              label={t('propertiesPanel.textColor')}
               type="color"
               value={localColor}
               onChange={(e) => {
@@ -210,7 +209,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
           )}
 
           <TextField
-            label="X"
+            label={t('propertiesPanel.positionX')}
             value={localX}
             onChange={(e) => handleNumberInputLocalChange(setLocalX, e as React.ChangeEvent<HTMLInputElement>)}
             onBlur={(e) => handleNumberInputBlur('x', e.target.value)}
@@ -221,7 +220,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
             }}
           />
           <TextField
-            label="Y"
+            label={t('propertiesPanel.positionY')}
             value={localY}
             onChange={(e) => handleNumberInputLocalChange(setLocalY, e as React.ChangeEvent<HTMLInputElement>)}
             onBlur={(e) => handleNumberInputBlur('y', e.target.value)}
@@ -232,7 +231,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
             }}
           />
           <TextField
-            label="Width"
+            label={t('propertiesPanel.width')}
             value={localWidth}
             onChange={(e) => handleNumberInputLocalChange(setLocalWidth, e as React.ChangeEvent<HTMLInputElement>)}
             onBlur={(e) => handleNumberInputBlur('width', e.target.value)}
@@ -243,7 +242,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
             }}
           />
           <TextField
-            label="Height"
+            label={t('propertiesPanel.height')}
             value={localHeight}
             onChange={(e) => handleNumberInputLocalChange(setLocalHeight, e as React.ChangeEvent<HTMLInputElement>)}
             onBlur={(e) => handleNumberInputBlur('height', e.target.value)}
@@ -350,14 +349,14 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
             variant="contained"
             color="error"
             onClick={() => {
-              if (selectedObject && window.confirm(`Delete ${selectedObject.type} (${selectedObject.id})? This action cannot be undone.`)) {
+              if (selectedObject && window.confirm(t('propertiesPanel.deleteConfirmation', { type: selectedObject.type, id: selectedObject.id }))) {
                 onDeleteObject(selectedObject.id);
               }
             }}
             sx={{ mt: 3 }} // Margin top for spacing
             className="delete-btn" // Apply the CSS class
           >
-            Delete Object
+            {t('propertiesPanel.deleteButton')}
           </Button>
         </Box>
       ) : (

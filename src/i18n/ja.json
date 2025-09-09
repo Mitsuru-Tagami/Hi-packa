@@ -54,6 +54,8 @@
     "newCardName": "カード {{number}}",
     "defaultButtonText": "ボタン",
     "defaultTextBoxText": "テキストボックス",
+    "newButton": "新規ボタン",
+    "newTextBox": "新規テキストボックス",
     "contextMenuAddButton": "ボタンを追加",
     "contextMenuAddText": "テキストを追加",
     "contextMenuAddImage": "画像を追加",
@@ -64,6 +66,24 @@
     "aiHelperText": "AIにスクリプトのアイデアを聞く",
     "runMode": "実行",
     "editMode": "編集",
-    "exportHtml": "HTML書き出し"
+    "exportHtml": "HTML書き出し",
+    "propertiesPanel": {
+      "title": "プロパティパネル",
+      "selectedObjectLabel": "選択中のオブジェクト: {{id}} ({{type}})",
+      "deleteButton": "オブジェクトを削除",
+      "deleteConfirmation": "オブジェクト '{{type}} ({{id}})' を削除しますか？ この操作は元に戻せません。",
+      "textLabel": "テキスト",
+      "labelLabel": "ラベル",
+      "textAlign": "テキスト配置",
+      "alignLeft": "左揃え",
+      "alignCenter": "中央揃え",
+      "alignRight": "右揃え",
+      "alignJustify": "両端揃え",
+      "textColor": "文字色",
+      "positionX": "X座標",
+      "positionY": "Y座標",
+      "width": "幅",
+      "height": "高さ"
+    }
   }
 }

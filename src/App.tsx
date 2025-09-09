@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Layout from './components/Layout';
 import { initialStack } from './initialData';
 import type { Stack, StackObject, ObjectType } from './types';
+import { t } from './i18n';
 
 function App() {
   const [stack, setStack] = useState<Stack>(initialStack);
@@ -118,7 +119,7 @@ function App() {
         id: `obj-${Date.now()}`,
         type,
         x, y, width: 100, height: 50,
-        text: type === 'button' ? 'New Button' : 'New Text Box',
+        text: type === 'button' ? t('newButton') : t('newTextBox'),
         textAlign: 'center',
         borderWidth: 'thin',
         script: '',
