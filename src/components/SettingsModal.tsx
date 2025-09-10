@@ -11,19 +11,18 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import i18next, { t } from '../i18n';
-import IconButton from '@mui/material/IconButton'; // Import IconButton
-import InputAdornment from '@mui/material/InputAdornment'; // Import InputAdornment
-import Visibility from '@mui/icons-material/Visibility'; // Import Visibility icon
-import VisibilityOff from '@mui/icons-material/VisibilityOff'; // Import VisibilityOff icon
-import FormControlLabel from '@mui/material/FormControlLabel'; // Import FormControlLabel
-import Switch from '@mui/material/Switch'; // Import Switch
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSetMagicEnabled: (enabled: boolean) => void;
-  allowScriptingOnAllObjects: boolean; // New prop
-  isMagicEnabled: boolean; // New prop
+  isMagicEnabled?: boolean; // 現在のmagic状態を取得するためのオプショナルprop
 }
 
 const style = {
@@ -41,21 +40,23 @@ const style = {
 const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
-  onSetMagicEnabled,  isMagicEnabled, // Add this prop
+  onSetMagicEnabled,
+  isMagicEnabled = false, // デフォルト値を設定
 }) => {
   const [magicInput, setMagicInput] = useState('');
   const [error, setError] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // New state for password visibility
-  const [selectedLanguage, setSelectedLanguage] = useState(i18next.language); // New state for language
-  const MAGIC_WORD = 'magic'; // Define the magic word (changed to lowercase)
+  const [showPassword, setShowPassword] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState(i18next.language);
+  
+  const MAGIC_WORD = 'magic';
 
   const handleUnlock = () => {
     if (magicInput === MAGIC_WORD) {
       onSetMagicEnabled(true);
-      alert(t('settingsModal.unlockedAlert')); // Temporarily re-enabled alert
+      alert(t('settingsModal.unlockedAlert'));
       setTimeout(() => {
         onClose();
-      }, 100); // Close after a short delay
+      }, 100);
     } else {
       setError(t('settingsModal.incorrectMagicWord'));
     }
@@ -68,9 +69,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const handleClose = () => {
-    setError(''); // Clear error on close
-    setMagicInput(''); // Clear input on close
-    setShowPassword(false); // Reset password visibility on close
+    setError('');
+    setMagicInput('');
+    setShowPassword(false);
     onClose();
   };
 
@@ -108,47 +109,52 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           </Select>
         </FormControl>
 
-        {/* Allow Scripting on All Objects Toggle - Moved and controlled by magic */}
+        {/* Allow Scripting on All Objects Toggle - 修正版 */}
         <FormControlLabel
-          sx={{ mt: 2, display: 'block' }} // Removed color here
+          sx={{ mt: 2, display: 'block' }}
           control={
             <Switch
-              checked={selectedObject.type === 'script'}
-              onChange={(e) => (e.target.checked)}
-              disabled={!isMagicEnabled} // Disabled if magic is not enabled
+              disabled={!isMagicEnabled}
             />
           }
-          label={<Typography sx={{ color: 'rgba(0, 0, 0, 0.87)' }}>{t('settingsModal.allowScriptingOnAllObjects')}</Typography>}
+          label={
+            <Typography sx={{ color: 'rgba(0, 0, 0, 0.87)' }}>
+              {t('settingsModal.allowScriptingOnAllObjects')}
+            </Typography>
+          }
         />
 
         <Typography id="settings-modal-description" sx={{ mt: 2 }}>
           {t('settingsModal.magicWordPrompt')}
         </Typography>
+        
         <TextField
           label={t('settingsModal.magicWordLabel')}
-          type={showPassword ? 'text' : 'password'} // Toggle type based on showPassword
+          type={showPassword ? 'text' : 'password'}
           fullWidth
           margin="normal"
           value={magicInput}
           onChange={(e) => {
             setMagicInput(e.target.value);
-            setError(''); // Clear error on input change
+            setError('');
           }}
           onKeyPress={(e) => {
             if (e.key === 'Enter') {
               handleUnlock();
             }
           }}
-          InputProps={{ // Add InputProps for adornment
+          InputProps={{
             endAdornment: (
-              <IconButton
-                aria-label={t('settingsModal.togglePasswordVisibility')}
-                onClick={handleClickShowPassword}
-                onMouseDown={handleMouseDownPassword}
-                edge="end"
-              >
-                {showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label={t('settingsModal.togglePasswordVisibility')}
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
             ),
           }}
         />
@@ -158,6 +164,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             {error}
           </Alert>
         )}
+        
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
           <Button variant="outlined" onClick={handleClose}>
             {t('settingsModal.cancelButton')}
@@ -171,6 +178,4 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   );
 };
 
-export const SettingsModalComponent = SettingsModal; // Changed from default export
-
-// export default SettingsModal; // Commented out default export
+export const SettingsModalComponent = SettingsModal;

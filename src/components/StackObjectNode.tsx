@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Group, Rect, Text, Transformer, Image } from 'react-konva';
 import type { StackObject, BorderWidth } from '../types';
 
@@ -21,63 +21,121 @@ const borderWidthMap: Record<BorderWidth, number> = {
   thick: 4,
 };
 
-export const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSelected, onSelect, onUpdateObject, isRunMode, onSwitchCard, onOpenUrl, executeScript }) => {
+// ユーティリティ関数
+const parseFontSize = (fontSize: string | undefined): number => {
+  if (!fontSize) return 16;
+  const parsed = parseInt(fontSize.replace(/px|em|rem|pt/, ''), 10);
+  return isNaN(parsed) ? 16 : Math.max(8, parsed); // 最小8px
+};
+
+const calculateImageDimensions = (
+  img: HTMLImageElement,
+  containerWidth: number,
+  containerHeight: number,
+  objectFit: 'contain' | 'fill' = 'contain'
+): { x: number; y: number; width: number; height: number } => {
+  if (objectFit === 'fill') {
+    return { x: 0, y: 0, width: containerWidth, height: containerHeight };
+  }
+
+  // contain mode
+  const aspectRatio = img.width / img.height;
+  const containerAspectRatio = containerWidth / containerHeight;
+
+  if (aspectRatio > containerAspectRatio) {
+    const imageWidth = containerWidth;
+    const imageHeight = containerWidth / aspectRatio;
+    return {
+      x: 0,
+      y: (containerHeight - imageHeight) / 2,
+      width: imageWidth,
+      height: imageHeight,
+    };
+  } else {
+    const imageHeight = containerHeight;
+    const imageWidth = containerHeight * aspectRatio;
+    return {
+      x: (containerWidth - imageWidth) / 2,
+      y: 0,
+      width: imageWidth,
+      height: imageHeight,
+    };
+  }
+};
+
+export const StackObjectNode: React.FC<StackObjectNodeProps> = ({ 
+  object, 
+  isSelected, 
+  onSelect, 
+  onUpdateObject, 
+  isRunMode, 
+  onSwitchCard, 
+  onOpenUrl, 
+  executeScript 
+}) => {
   const shapeRef = useRef<any>();
   const trRef = useRef<any>();
-
   const [img, setImg] = useState<HTMLImageElement | undefined>(undefined);
 
+  // Image loading effect with cleanup
   useEffect(() => {
-    if (object.type === 'image' && object.src) {
-      const newImg = new window.Image();
-      newImg.src = object.src;
-      newImg.onload = () => {
-        setImg(newImg);
-      };
-      newImg.onerror = () => {
-        setImg(undefined); // Clear image on error
-        console.error('Failed to load image:', object.src);
-      };
-    } else {
+    if (object.type !== 'image' || !object.src) {
       setImg(undefined);
+      return;
     }
+
+    const newImg = new window.Image();
+    let isCancelled = false;
+
+    const handleLoad = () => {
+      if (!isCancelled) {
+        setImg(newImg);
+      }
+    };
+
+    const handleError = () => {
+      if (!isCancelled) {
+        setImg(undefined);
+        console.error('Failed to load image:', object.src);
+      }
+    };
+
+    newImg.onload = handleLoad;
+    newImg.onerror = handleError;
+    newImg.src = object.src;
+
+    // Cleanup function
+    return () => {
+      isCancelled = true;
+      newImg.onload = null;
+      newImg.onerror = null;
+    };
   }, [object.type, object.src]);
 
+  // Transformer effect
   useEffect(() => {
-    if (isSelected) {
-      // attach transformer to the node
+    if (isSelected && trRef.current && shapeRef.current) {
       trRef.current.nodes([shapeRef.current]);
-      trRef.current.getLayer().batchDraw();
+      trRef.current.getLayer()?.batchDraw();
     }
   }, [isSelected]);
 
-  const { x, y, width, height, type, text, ...rest } = object;
-
-  // Use object.borderColor if available, otherwise default to black
-  const currentStrokeColor = object.borderColor || '#000000';
-  // Use object.borderWidth if available, otherwise default to 'none'
-  const currentStrokeWidth = borderWidthMap[object.borderWidth || 'none'];
-
-  // Highlight color/width if selected
-  const strokeColor = isSelected ? 'blue' : currentStrokeColor;
-  const strokeWidth = isSelected ? 3 : currentStrokeWidth;
-
-  // Determine fill color based on object.backgroundColor
-  const fillColor = object.backgroundColor === 'transparent' ? 'rgba(0,0,0,0)' : (object.backgroundColor || '#ffffff');
-
-  const handleDragEnd = (e: any) => {
+  const handleDragEnd = useCallback((e: any) => {
     onUpdateObject({
       ...object,
       x: e.target.x(),
       y: e.target.y(),
     });
-  };
+  }, [object, onUpdateObject]);
 
-  const handleTransformEnd = (e: any) => {
+  const handleTransformEnd = useCallback((e: any) => {
     const node = shapeRef.current;
+    if (!node) return;
+
     const scaleX = node.scaleX();
     const scaleY = node.scaleY();
 
+    // Reset scale
     node.scaleX(1);
     node.scaleY(1);
 
@@ -88,9 +146,9 @@ export const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSele
       width: Math.max(5, node.width() * scaleX),
       height: Math.max(5, node.height() * scaleY),
     });
-  };
+  }, [object, onUpdateObject]);
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     if (isRunMode) {
       if (object.type === 'button') {
         if (object.action === 'jumpToCard' && object.jumpToCardId) {
@@ -101,30 +159,36 @@ export const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSele
           executeScript(object.script);
         }
       }
-    } else { // Edit mode
+    } else {
       onSelect();
     }
-  };
+  }, [
+    isRunMode,
+    object.type,
+    object.action,
+    object.jumpToCardId,
+    object.src,
+    object.script,
+    onSwitchCard,
+    onOpenUrl,
+    executeScript,
+    onSelect,
+  ]);
 
-  let imageX = 0;
-  let imageY = 0;
-  let imageWidth = width;
-  let imageHeight = height;
+  // Destructure with proper typing
+  const { x, y, width, height, type, text } = object;
 
-  if (object.type === 'image' && img && object.objectFit === 'contain') {
-    const aspectRatio = img.width / img.height;
-    const containerAspectRatio = width / height;
+  // Style calculations
+  const currentStrokeColor = object.borderColor || '#000000';
+  const currentStrokeWidth = borderWidthMap[object.borderWidth || 'none'];
+  const strokeColor = isSelected ? 'blue' : currentStrokeColor;
+  const strokeWidth = isSelected ? 3 : currentStrokeWidth;
+  const fillColor = object.backgroundColor === 'transparent' ? 'rgba(0,0,0,0)' : (object.backgroundColor || '#ffffff');
 
-    if (aspectRatio > containerAspectRatio) {
-      imageWidth = width;
-      imageHeight = width / aspectRatio;
-      imageY = (height - imageHeight) / 2;
-    } else {
-      imageHeight = height;
-      imageWidth = height * aspectRatio;
-      imageX = (width - imageWidth) / 2;
-    }
-  }
+  // Image dimensions calculation
+  const imageDimensions = img && object.type === 'image'
+    ? calculateImageDimensions(img, width, height, object.objectFit)
+    : { x: 0, y: 0, width, height };
 
   return (
     <React.Fragment>
@@ -140,46 +204,50 @@ export const StackObjectNode: React.FC<StackObjectNodeProps> = ({ object, isSele
         onTransformEnd={handleTransformEnd}
         ref={shapeRef}
       >
-        {/* Common background/border for all objects */}
+        {/* Background/border rectangle */}
         <Rect
           width={width}
           height={height}
-          fill={fillColor} // Use dynamic fillColor
+          fill={fillColor}
           stroke={strokeColor}
           strokeWidth={strokeWidth}
         />
-        {/* Render text content, common for buttons and text boxes */}
-        <Text
-          text={text}
-          width={width}
-          height={height}
-          align={rest.textAlign}
-          verticalAlign="middle"
-          padding={5}
-          fontSize={Number(rest.fontSize?.replace('px', '')) || 16}
-          fontStyle={rest.fontStyle}
-          fontFamily={rest.fontFamily || 'sans-serif'}
-          fill={object.color || '#000'}
-          textDecoration={rest.textDecoration}
-        />
 
-        {/* Render image content */}
+        {/* Text content - for buttons and text boxes */}
+        {text && (
+          <Text
+            text={text}
+            width={width}
+            height={height}
+            align={object.textAlign || 'left'}
+            verticalAlign="middle"
+            padding={5}
+            fontSize={parseFontSize(object.fontSize)}
+            fontStyle={object.fontStyle}
+            fontFamily={object.fontFamily || 'sans-serif'}
+            fill={object.color || '#000000'}
+            textDecoration={object.textDecoration}
+          />
+        )}
+
+        {/* Image content */}
         {object.type === 'image' && img && (
           <Image
             image={img}
-            x={imageX}
-            y={imageY}
-            width={imageWidth}
-            height={imageHeight}
+            x={imageDimensions.x}
+            y={imageDimensions.y}
+            width={imageDimensions.width}
+            height={imageDimensions.height}
           />
         )}
-        {/* We can add type-specific renderings here later (e.g., for images) */}
       </Group>
+
+      {/* Transformer for selected objects */}
       {isSelected && (
         <Transformer
           ref={trRef}
           boundBoxFunc={(oldBox, newBox) => {
-            // limit resize
+            // Limit minimum resize dimensions
             if (newBox.width < 5 || newBox.height < 5) {
               return oldBox;
             }

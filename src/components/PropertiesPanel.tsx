@@ -1,40 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import type { StackObject, BorderWidth, TextAlign, Card, Stack } from '../types';
 
-// Remove invalid export and move these state declarations inside the PropertiesPanel component below.
-
 interface PropertiesPanelProps {
   selectedObject: StackObject | null;
   onUpdateObject: (object: StackObject) => void;
   isRunMode: boolean;
   isMagicEnabled: boolean;
   onDeleteObject: (objectId: string) => void;
-  onUpdateCardDimensions: (cardId: string, width: number, height: number) => void; // New prop
-  currentCard: Card | null; // New prop
-  onDeleteCard: (cardId: string) => void; // New prop for card deletion
-  stack: Stack; // Stack型推奨
+  onUpdateCardDimensions: (cardId: string, width: number, height: number) => void;
+  currentCard: Card | null;
+  onDeleteCard: (cardId: string) => void;
+  stack: Stack;
 }
 
-// Hide the panel completely if in run mode
-export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpdateObject, isRunMode, isMagicEnabled, onDeleteObject, onUpdateCardDimensions, currentCard, onDeleteCard, stack }) => {
-  // Card関連のローカルステート
-  const [localCardName, setLocalCardName] = useState<string>(currentCard?.name || '');
-  const [localCardWidth, setLocalCardWidth] = useState<string>(currentCard?.width ? currentCard.width.toString() : '');
-  const [localCardHeight, setLocalCardHeight] = useState<string>(currentCard?.height ? currentCard.height.toString() : '');
-  const [selectedSizeLabel, setSelectedSizeLabel] = useState<string>('');
+// ユーティリティ関数を追加
+const parseUnitValue = (value: string): number => {
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? 0 : parsed;
+};
 
-  useEffect(() => {
-    if (selectedObject) {
-      setLocalSrc(selectedObject.src || '');
-      setLocalObjectFit(selectedObject.objectFit || 'contain');
+const PREDEFINED_CARD_SIZES = [
+  { label: 'iPhone 8 Plus (414x736)', width: 414, height: 736 },
+  { label: 'iPhone 12/13 (390x844)', width: 390, height: 844 },
+  { label: 'iPad (768x1024)', width: 768, height: 1024 },
+  { label: 'Desktop (1280x720)', width: 1280, height: 720 },
+  { label: 'Custom', width: 0, height: 0 },
+];
 
-      // Initialize background color and transparency
-      if (selectedObject.backgroundColor === 'transparent' || selectedObject.backgroundColor === 'rgba(0,0,0,0)') {
-        setIsTransparentBackground(true);
-        setLocalBackgroundColor('#ffffff'); // Default color when transparent is checked
-      } else {
-        setIsTransparentBackground(false);
-export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpdateObject, isRunMode, isMagicEnabled, onDeleteObject, onUpdateCardDimensions, currentCard, onDeleteCard, stack }) => {
+export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ 
+  selectedObject, 
+  onUpdateObject, 
+  isRunMode, 
+  isMagicEnabled, 
+  onDeleteObject, 
+  onUpdateCardDimensions, 
+  currentCard, 
+  onDeleteCard, 
+  stack 
+}) => {
   // Object関連のローカルステート
   const [localX, setLocalX] = useState<string>('');
   const [localY, setLocalY] = useState<string>('');
@@ -45,17 +48,46 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
   const [localBorderColor, setLocalBorderColor] = useState<string>('');
   const [localBorderWidth, setLocalBorderWidth] = useState<BorderWidth>('none');
   const [localTextAlign, setLocalTextAlign] = useState<TextAlign>('left');
-  const [localBackgroundColor, setLocalBackgroundColor] = useState<string>(''); // New local state for background color
-  const [localColor, setLocalColor] = useState<string>(''); // New local state for text color
-  const [localSrc, setLocalSrc] = useState<string>(''); // New local state for image source
-  const [localObjectFit, setLocalObjectFit] = useState<'contain' |'fill'>('contain'); // New local state for object fit
-  const [isTransparentBackground, setIsTransparentBackground] = useState<boolean>(false); // New local state for transparency
+  const [localBackgroundColor, setLocalBackgroundColor] = useState<string>('');
+  const [localColor, setLocalColor] = useState<string>('');
+  const [localSrc, setLocalSrc] = useState<string>('');
+  const [localObjectFit, setLocalObjectFit] = useState<'contain' | 'fill'>('contain');
+  const [isTransparentBackground, setIsTransparentBackground] = useState<boolean>(false);
 
   // Card関連のローカルステート
   const [localCardName, setLocalCardName] = useState<string>(currentCard?.name || '');
   const [localCardWidth, setLocalCardWidth] = useState<string>(currentCard?.width ? currentCard.width.toString() : '');
   const [localCardHeight, setLocalCardHeight] = useState<string>(currentCard?.height ? currentCard.height.toString() : '');
   const [selectedSizeLabel, setSelectedSizeLabel] = useState<string>('');
+
+  useEffect(() => {
+    if (selectedObject) {
+      // Object properties initialization
+      setLocalX(selectedObject.x?.toString() || '');
+      setLocalY(selectedObject.y?.toString() || '');
+      setLocalWidth(selectedObject.width?.toString() || '');
+      setLocalHeight(selectedObject.height?.toString() || '');
+      setLocalText(selectedObject.text || '');
+      setLocalScript(selectedObject.script || '');
+      setLocalBorderColor(selectedObject.borderColor || '');
+      setLocalBorderWidth(selectedObject.borderWidth || 'none');
+      setLocalTextAlign(selectedObject.textAlign || 'left');
+      setLocalColor(selectedObject.color || '');
+      setLocalSrc(selectedObject.src || '');
+      setLocalObjectFit(selectedObject.objectFit || 'contain');
+
+      // Initialize background color and transparency
+      if (selectedObject.backgroundColor === 'transparent' || selectedObject.backgroundColor === 'rgba(0,0,0,0)') {
+        setIsTransparentBackground(true);
+        setLocalBackgroundColor('#ffffff'); // Default color when transparent is checked
+      } else {
+        setIsTransparentBackground(false);
+        setLocalBackgroundColor(selectedObject.backgroundColor || '');
+      }
+    } else {
+      // Reset all object states when no object is selected
+      setLocalX('');
+      setLocalY('');
       setLocalWidth('');
       setLocalHeight('');
       setLocalText('');
@@ -64,20 +96,34 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
       setLocalBorderWidth('none');
       setLocalTextAlign('left');
       setLocalBackgroundColor('');
+      setLocalColor('');
+      setLocalSrc('');
+      setLocalObjectFit('contain');
       setIsTransparentBackground(false);
-      // Initialize card dimensions
-      if (currentCard) {
-        setLocalCardHeight(currentCard.height.toString());
-        const matchedSize = PREDEFINED_CARD_SIZES.find(
-          size => size.width === currentCard.width && size.height === currentCard.height
-        );
-        setSelectedSizeLabel(matchedSize ? matchedSize.label : 'Custom');
-      } else {
-        setLocalCardWidth('');
-        setLocalCardHeight('');
-      }
+    }
+
+    // Initialize card dimensions
+    if (currentCard) {
+      setLocalCardName(currentCard.name || '');
+      setLocalCardWidth(currentCard.width.toString());
+      setLocalCardHeight(currentCard.height.toString());
+      
+      const matchedSize = PREDEFINED_CARD_SIZES.find(
+        size => size.width === currentCard.width && size.height === currentCard.height
+      );
+      setSelectedSizeLabel(matchedSize ? matchedSize.label : 'Custom');
+    } else {
+      setLocalCardName('');
+      setLocalCardWidth('');
+      setLocalCardHeight('');
+      setSelectedSizeLabel('');
     }
   }, [selectedObject, currentCard]);
+
+  // RunModeの場合はパネルを隠す
+  if (isRunMode) {
+    return null;
+  }
 
   const handlePropertyChange = (key: keyof StackObject, value: any) => {
     if (selectedObject) {
@@ -93,16 +139,17 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
   };
 
   const handleNumberInputBlur = (key: keyof StackObject, rawValue: string) => {
-  const pixelValue = parseUnitValue(rawValue);
+    const pixelValue = parseUnitValue(rawValue);
     if (!isNaN(pixelValue)) {
       handlePropertyChange(key, pixelValue);
     } else {
+      // Revert to current object value if parsing fails
       if (selectedObject) {
         switch (key) {
-          case 'x': setLocalX(selectedObject.x.toFixed(2)); break;
-          case 'y': setLocalY(selectedObject.y.toFixed(2)); break;
-          case 'width': setLocalWidth(selectedObject.width.toFixed(2)); break;
-          case 'height': setLocalHeight(selectedObject.height.toFixed(2)); break;
+          case 'x': setLocalX(selectedObject.x?.toString() || ''); break;
+          case 'y': setLocalY(selectedObject.y?.toString() || ''); break;
+          case 'width': setLocalWidth(selectedObject.width?.toString() || ''); break;
+          case 'height': setLocalHeight(selectedObject.height?.toString() || ''); break;
         }
       }
     }
@@ -125,13 +172,11 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
     }
   };
 
-  const PREDEFINED_CARD_SIZES = [
-    { label: 'iPhone 8 Plus (414x736)', width: 414, height: 736 },
-    { label: 'iPhone 12/13 (390x844)', width: 390, height: 844 },
-    { label: 'iPad (768x1024)', width: 768, height: 1024 },
-    { label: 'Desktop (1280x720)', width: 1280, height: 720 },
-    { label: 'Custom', width: 0, height: 0 }, // Placeholder for custom input
-  ];
-}
-
-// Remove this duplicate component definition and keep only the first, fully implemented PropertiesPanel component above.
+  // ここにJSXの返り値を追加する必要があります
+  return (
+    <div className="properties-panel">
+      {/* プロパティパネルのUIをここに実装 */}
+      <p>Properties Panel - UI implementation needed</p>
+    </div>
+  );
+};

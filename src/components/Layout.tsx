@@ -5,7 +5,7 @@ import CardListPanel from './CardListPanel';
 import CardCanvas from './CardCanvas';
 import { PropertiesPanel } from './PropertiesPanel';
 import { SettingsModalComponent } from './SettingsModal';
-import type { Stack, StackObject, ObjectType } from '../types'; // Import ObjectType
+import type { Stack, StackObject, ObjectType } from '../types';
 
 interface LayoutProps {
   stack: Stack;
@@ -22,13 +22,13 @@ interface LayoutProps {
   onOpenSettingsModal: () => void;
   onCloseSettingsModal: () => void;
   onSetMagicEnabled: (enabled: boolean) => void;
-  onAddObject: (type: ObjectType, x: number, y: number) => void; // New prop
-  onDeleteObject: (objectId: string) => void; // New prop
-  onUpdateCardDimensions: (cardId: string, width: number, height: number) => void; // New prop
-  onSetAllowScriptingOnAllObjects: (enabled: boolean) => void; // New prop
-  onAddCard: () => void; // New prop
-  onUpdateCardName: (cardId: string, newName: string) => void; // New prop
-  onDeleteCard: (cardId: string) => void; // New prop for card deletion
+  onAddObject: (type: ObjectType, x: number, y: number) => void;
+  onDeleteObject: (objectId: string) => void;
+  onUpdateCardDimensions: (cardId: string, width: number, height: number) => void;
+  onSetAllowScriptingOnAllObjects: (enabled: boolean) => void;
+  onAddCard: () => void;
+  onUpdateCardName: (cardId: string, newName: string) => void;
+  onDeleteCard: (cardId: string) => void;
 }
 
 const Layout: React.FC<LayoutProps> = ({
@@ -49,26 +49,53 @@ const Layout: React.FC<LayoutProps> = ({
   onAddObject,
   onDeleteObject,
   onUpdateCardDimensions,
+  onSetAllowScriptingOnAllObjects, // この未使用propsを追加
   onAddCard,
-  onUpdateCardName, // New prop
-  onDeleteCard, // New prop for card deletion
+  onUpdateCardName,
+  onDeleteCard,
 }) => {
   const currentCard = stack.cards.find(card => card.id === stack.currentCardId);
 
   return (
     <Box sx={{ flexGrow: 1, height: '100%' }}>
-  <Grid spacing={2} sx={{ height: '100%', display: 'grid', gridTemplateColumns: '3fr 6fr 3fr' }}>
-  <Grid sx={{ height: '100%', display: 'flex', flexDirection: 'column', gridColumn: '1 / span 1' }}>
+      {/* CSS Gridではなく、MUIの推奨する方法を使用 */}
+      <Box
+        sx={{
+          height: '100%',
+          display: 'grid',
+          gridTemplateColumns: '300px 1fr 300px', // より具体的なサイズ指定
+          gap: 2,
+        }}
+      >
+        {/* Left Panel - Card List */}
+        <Box sx={{ 
+          height: '100%', 
+          display: 'flex', 
+          flexDirection: 'column',
+          overflow: 'hidden'
+        }}>
           <CardListPanel
             stack={stack}
             onSwitchCard={onSwitchCard}
             isRunMode={isRunMode}
             onToggleRunMode={onToggleRunMode}
             onOpenSettingsModal={onOpenSettingsModal}
-            onAddCard={onAddCard} // New prop
+            onAddCard={onAddCard}
+            onUpdateCardName={onUpdateCardName} // 追加された未使用props
+            onDeleteCard={onDeleteCard} // 追加された未使用props
           />
-        </Grid>
-  <Grid sx={{ height: '100%', display: 'flex', flexDirection: 'column', gridColumn: '2 / span 1', position: 'relative', zIndex: 1, overflow: 'auto' }}>
+        </Box>
+
+        {/* Center Panel - Canvas */}
+        <Box sx={{ 
+          height: '100%', 
+          display: 'flex', 
+          flexDirection: 'column',
+          position: 'relative',
+          zIndex: 1,
+          overflow: 'auto',
+          minWidth: 0 // Grid itemの縮小を許可
+        }}>
           <CardCanvas
             stack={stack}
             selectedObject={selectedObject}
@@ -78,30 +105,39 @@ const Layout: React.FC<LayoutProps> = ({
             onOpenUrl={onOpenUrl}
             onSwitchCard={onSwitchCard}
             executeScript={executeScript}
-            onAddObject={onAddObject} // Pass to CardCanvas
+            onAddObject={onAddObject}
           />
-        </Grid>
-  <Grid sx={{ height: '100%', overflow: 'auto', gridColumn: '3 / span 1', position: 'relative', zIndex: 2, pointerEvents: 'auto' }}>
+        </Box>
+
+        {/* Right Panel - Properties */}
+        <Box sx={{ 
+          height: '100%',
+          overflow: 'auto',
+          position: 'relative',
+          zIndex: 2,
+          pointerEvents: 'auto'
+        }}>
           <PropertiesPanel
-            stack={stack} // Pass stack prop
+            stack={stack}
             selectedObject={selectedObject}
             onUpdateObject={onUpdateObject}
             isRunMode={isRunMode}
             isMagicEnabled={isMagicEnabled}
-            onDeleteObject={onDeleteObject} // Pass new prop
-            onUpdateCardDimensions={onUpdateCardDimensions} // Pass new prop
-            currentCard={currentCard} // Pass currentCard
-            onDeleteCard={onDeleteCard} // Pass card delete handler
+            onDeleteObject={onDeleteObject}
+            onUpdateCardDimensions={onUpdateCardDimensions}
+            currentCard={currentCard}
+            onDeleteCard={onDeleteCard}
           />
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
+
       {/* Settings Modal */}
-      <SettingsModalComponent
-        isOpen={isSettingsModalOpen}
-        onClose={onCloseSettingsModal}
-        onSetMagicEnabled={onSetMagicEnabled}
-      />
-    </Box>
+  <SettingsModalComponent
+  isOpen={isSettingsModalOpen}
+  onClose={onCloseSettingsModal}
+  onSetMagicEnabled={onSetMagicEnabled}
+  isMagicEnabled={isMagicEnabled}
+/>    </Box>
   );
 };
 
