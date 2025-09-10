@@ -29,6 +29,7 @@ interface LayoutProps {
   onSetAllowScriptingOnAllObjects: (enabled: boolean) => void; // New prop
   onAddCard: () => void; // New prop
   onUpdateCardName: (cardId: string, newName: string) => void; // New prop
+  onDeleteCard: (cardId: string) => void; // New prop for card deletion
 }
 
 const Layout: React.FC<LayoutProps> = ({
@@ -53,13 +54,14 @@ const Layout: React.FC<LayoutProps> = ({
   onSetAllowScriptingOnAllObjects,
   onAddCard,
   onUpdateCardName, // New prop
+  onDeleteCard, // New prop for card deletion
 }) => {
   const currentCard = stack.cards.find(card => card.id === stack.currentCardId);
 
   return (
     <Box sx={{ flexGrow: 1, height: '100%' }}>
-      <Grid container spacing={2} sx={{ height: '100%' }}>
-        <Grid item xs={3} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+  <Grid spacing={2} sx={{ height: '100%', display: 'grid', gridTemplateColumns: '3fr 6fr 3fr' }}>
+  <Grid sx={{ height: '100%', display: 'flex', flexDirection: 'column', gridColumn: '1 / span 1' }}>
           <CardListPanel
             stack={stack}
             onSwitchCard={onSwitchCard}
@@ -69,7 +71,7 @@ const Layout: React.FC<LayoutProps> = ({
             onAddCard={onAddCard} // New prop
           />
         </Grid>
-        <Grid item xs={6} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+  <Grid sx={{ height: '100%', display: 'flex', flexDirection: 'column', gridColumn: '2 / span 1', position: 'relative', zIndex: 1, overflow: 'auto' }}>
           <CardCanvas
             stack={stack}
             selectedObject={selectedObject}
@@ -82,8 +84,9 @@ const Layout: React.FC<LayoutProps> = ({
             onAddObject={onAddObject} // Pass to CardCanvas
           />
         </Grid>
-        <Grid item xs={3} sx={{ height: '100%', overflow: 'auto' }}>
+  <Grid sx={{ height: '100%', overflow: 'auto', gridColumn: '3 / span 1', position: 'relative', zIndex: 2, pointerEvents: 'auto' }}>
           <PropertiesPanel
+            stack={stack} // Pass stack prop
             selectedObject={selectedObject}
             onUpdateObject={onUpdateObject}
             isRunMode={isRunMode}
@@ -92,7 +95,7 @@ const Layout: React.FC<LayoutProps> = ({
             onUpdateCardDimensions={onUpdateCardDimensions} // Pass new prop
             currentCard={currentCard} // Pass currentCard
             allowScriptingOnAllObjects={allowScriptingOnAllObjects} // New prop
-            onUpdateCardName={onUpdateCardName} // New prop
+            onDeleteCard={onDeleteCard} // Pass card delete handler
           />
         </Grid>
       </Grid>

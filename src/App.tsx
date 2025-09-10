@@ -179,6 +179,21 @@ function App() {
     }
   };
 
+  const handleDeleteCard = (cardId: string) => {
+    setStack(prevStack => {
+      // 最後のカードは削除不可
+      if (prevStack.cards.length <= 1) return prevStack;
+      const newCards = prevStack.cards.filter(card => card.id !== cardId);
+      // currentCardIdが消えた場合は先頭カードに切り替え
+      const newCurrentCardId = newCards[0]?.id || '';
+      return {
+        ...prevStack,
+        cards: newCards,
+        currentCardId: newCurrentCardId,
+      };
+    });
+  };
+
   const handleUpdateCardDimensions = (cardId: string, width: number, height: number) => {
     setStack(prevStack => {
       const newCards = prevStack.cards.map(card => {
@@ -243,6 +258,7 @@ function App() {
       onSetMagicEnabled={setIsMagicEnabled}
       onAddObject={handleAddObject}
       onDeleteObject={handleDeleteObject}
+      onDeleteCard={handleDeleteCard} // New prop
       onUpdateCardDimensions={handleUpdateCardDimensions}
       allowScriptingOnAllObjects={allowScriptingOnAllObjects} // New prop
       onSetAllowScriptingOnAllObjects={setAllowScriptingOnAllObjects} // New prop
