@@ -56,6 +56,7 @@
     "defaultTextBoxText": "テキストボックス",
     "newButton": "新規ボタン",
     "newTextBox": "新規テキストボックス",
+    "newImage": "新規画像",
     "contextMenuAddButton": "ボタンを追加",
     "contextMenuAddText": "テキストを追加",
     "contextMenuAddImage": "画像を追加",
@@ -67,6 +68,8 @@
     "runMode": "実行",
     "editMode": "編集",
     "exportHtml": "HTML書き出し",
+    "cards": "カード",
+    "mode": "モード",
     "propertiesPanel": {
       "title": "プロパティパネル",
       "selectedObjectLabel": "選択中のオブジェクト: {{id}} ({{type}})",
@@ -83,7 +86,45 @@
       "positionX": "X座標",
       "positionY": "Y座標",
       "width": "幅",
-      "height": "高さ"
+      "height": "高さ",
+      "imageSourceUrl": "画像ソース (URL)",
+      "objectFit": "オブジェクトのフィット方法",
+      "fitContain": "アスペクト比を維持",
+      "fitFill": "枠に合わせる",
+      "backgroundColor": "背景色",
+      "transparentBackground": "背景を透明にする",
+      "borderColor": "枠線の色",
+      "borderWidth": "枠線の太さ",
+      "borderNone": "なし",
+      "borderThin": "細い",
+      "borderMedium": "中間",
+      "borderThick": "太い",
+      "scriptLabel": "スクリプト (JavaScript)",
+      "scriptPlaceholder": "ここにJavaScriptコードを入力...",
+      "cardPropertiesLabel": "カードのプロパティ: {{name}} ({{id}})",
+      "cardSize": "カードサイズ",
+      "sizeCustom": "カスタム",
+      "customWidth": "カスタム幅",
+      "customHeight": "カスタム高さ"
+    },
+    "settingsModal": {
+      "title": "設定",
+      "language": "言語",
+      "languageJa": "日本語",
+      "languageEn": "English",
+      "magicWordPrompt": "高度なスクリプト機能のロックを解除するには、魔法の言葉を入力してください。",
+      "magicWordLabel": "魔法の言葉",
+      "togglePasswordVisibility": "パスワードの表示を切り替える",
+      "incorrectMagicWord": "魔法の言葉が違います。",
+      "cancelButton": "キャンセル",
+      "unlockButton": "ロック解除",
+      "unlockedAlert": "解錠！",
+      "allowScriptingOnAllObjects": "全てのオブジェクトでスクリプトを許可"
+    },
+    "contextMenu": {
+      "addButton": "ボタンを追加",
+      "addTextBox": "テキストボックスを追加",
+      "addImage": "画像を追加"
     }
   }
 }

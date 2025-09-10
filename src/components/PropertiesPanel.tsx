@@ -22,9 +22,19 @@ interface PropertiesPanelProps {
   onDeleteObject: (objectId: string) => void;
   onUpdateCardDimensions: (cardId: string, width: number, height: number) => void; // New prop
   currentCard: Card | null; // New prop
+  allowScriptingOnAllObjects: boolean; // New prop
 }
 
-export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpdateObject, isRunMode, isMagicEnabled, onDeleteObject, onUpdateCardDimensions, currentCard }) => {
+export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
+  selectedObject,
+  onUpdateObject,
+  isRunMode,
+  isMagicEnabled,
+  onDeleteObject,
+  onUpdateCardDimensions,
+  currentCard,
+  allowScriptingOnAllObjects, // New prop
+}) => {
   // Local state to manage input field values
   const [localX, setLocalX] = useState<string>('');
   const [localY, setLocalY] = useState<string>('');
@@ -257,7 +267,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
           {selectedObject.type === 'image' && (
             <>
               <TextField
-                label="Image Source (URL)"
+                label={t('propertiesPanel.imageSourceUrl')}
                 value={localSrc}
                 onChange={(e) => setLocalSrc(e.target.value)}
                 onBlur={(e) => handlePropertyChange('src', e.target.value)}
@@ -265,17 +275,17 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
                 size="small"
               />
               <FormControl fullWidth size="small">
-                <InputLabel>Object Fit</InputLabel>
+                <InputLabel>{t('propertiesPanel.objectFit')}</InputLabel>
                 <Select
                   value={localObjectFit}
-                  label="Object Fit"
+                  label={t('propertiesPanel.objectFit')}
                   onChange={(e) => {
                     setLocalObjectFit(e.target.value as 'contain' | 'fill');
                     handlePropertyChange('objectFit', e.target.value as 'contain' | 'fill');
                   }}
                 >
-                  <MenuItem value="contain">Contain</MenuItem>
-                  <MenuItem value="fill">Fill</MenuItem>
+                  <MenuItem value="contain">{t('propertiesPanel.fitContain')}</MenuItem>
+                  <MenuItem value="fill">{t('propertiesPanel.fitFill')}</MenuItem>
                 </Select>
               </FormControl>
             </>
@@ -283,7 +293,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
 
           {/* Background Color */}
           <TextField
-            label="Background Color"
+            label={t('propertiesPanel.backgroundColor')}
             type="color"
             value={localBackgroundColor}
             onChange={handleBackgroundColorChange}
@@ -298,11 +308,11 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
                 onChange={handleTransparentToggle}
               />
             }
-            label="Transparent Background"
+            label={t('propertiesPanel.transparentBackground')}
           />
           {/* Border Color */}
           <TextField
-            label="Border Color"
+            label={t('propertiesPanel.borderColor')}
             type="color"
             value={localBorderColor}
             onChange={(e) => setLocalBorderColor(e.target.value)}
@@ -312,26 +322,26 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
           />
           {/* Border Width */}
           <FormControl fullWidth size="small">
-            <InputLabel>Border Width</InputLabel>
+            <InputLabel>{t('propertiesPanel.borderWidth')}</InputLabel>
             <Select
               value={localBorderWidth}
-              label="Border Width"
+              label={t('propertiesPanel.borderWidth')}
               onChange={(e) => {
                 setLocalBorderWidth(e.target.value as BorderWidth);
                 handlePropertyChange('borderWidth', e.target.value as BorderWidth);
               }}
             >
-              <MenuItem value="none">None</MenuItem>
-              <MenuItem value="thin">Thin</MenuItem>
-              <MenuItem value="medium">Medium</MenuItem>
-              <MenuItem value="thick">Thick</MenuItem>
+              <MenuItem value="none">{t('propertiesPanel.borderNone')}</MenuItem>
+              <MenuItem value="thin">{t('propertiesPanel.borderThin')}</MenuItem>
+              <MenuItem value="medium">{t('propertiesPanel.borderMedium')}</MenuItem>
+              <MenuItem value="thick">{t('propertiesPanel.borderThick')}</MenuItem>
             </Select>
           </FormControl>
 
           {/* Script field */}
-          {selectedObject.type === 'button' && (
+          {(selectedObject.type === 'button' || allowScriptingOnAllObjects) && (
             <TextField
-              label="Script (JavaScript)"
+              label={t('propertiesPanel.scriptLabel')}
               multiline
               rows={4}
               value={localScript}
@@ -339,7 +349,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
               onBlur={(e) => handlePropertyChange('script', e.target.value)}
               fullWidth
               size="small"
-              placeholder="Enter JavaScript code here..."
+              placeholder={t('propertiesPanel.scriptPlaceholder')}
               disabled={!isMagicEnabled} // Disable if magic is not enabled
             />
           )}
@@ -363,15 +373,15 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
         // UI for card properties when no object is selected
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Typography variant="subtitle1">
-            Card Properties: {currentCard?.name} ({currentCard?.id})
+            {t('propertiesPanel.cardPropertiesLabel', { name: currentCard?.name, id: currentCard?.id })}
           </Typography>
 
           <FormControl fullWidth margin="normal">
-            <InputLabel id="card-size-select-label">Card Size</InputLabel>
+            <InputLabel id="card-size-select-label">{t('propertiesPanel.cardSize')}</InputLabel>
             <Select
               labelId="card-size-select-label"
               value={selectedSizeLabel}
-              label="Card Size"
+              label={t('propertiesPanel.cardSize')}
               onChange={(e) => {
                 const newLabel = e.target.value;
                 setSelectedSizeLabel(newLabel);
@@ -388,7 +398,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
             >
               {PREDEFINED_CARD_SIZES.map((size) => (
                 <MenuItem key={size.label} value={size.label}>
-                  {size.label}
+                  {size.label === 'Custom' ? t('propertiesPanel.sizeCustom') : size.label}
                 </MenuItem>
               ))}
             </Select>
@@ -398,7 +408,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
           {selectedSizeLabel === 'Custom' && (
             <>
               <TextField
-                label="Custom Width"
+                label={t('propertiesPanel.customWidth')}
                 value={localCardWidth}
                 onChange={(e) => setLocalCardWidth(e.target.value)}
                 onBlur={(e) => {
@@ -418,7 +428,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject
                 }}
               />
               <TextField
-                label="Custom Height"
+                label={t('propertiesPanel.customHeight')}
                 value={localCardHeight}
                 onChange={(e) => setLocalCardHeight(e.target.value)}
                 onBlur={(e) => {

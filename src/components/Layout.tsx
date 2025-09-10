@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid';
 import CardListPanel from './CardListPanel';
 import CardCanvas from './CardCanvas';
 import { PropertiesPanel } from './PropertiesPanel';
-import SettingsModal from './SettingsModal';
+import { SettingsModalComponent } from './SettingsModal';
 import type { Stack, StackObject, ObjectType } from '../types'; // Import ObjectType
 
 interface LayoutProps {
@@ -25,6 +25,8 @@ interface LayoutProps {
   onAddObject: (type: ObjectType, x: number, y: number) => void; // New prop
   onDeleteObject: (objectId: string) => void; // New prop
   onUpdateCardDimensions: (cardId: string, width: number, height: number) => void; // New prop
+  allowScriptingOnAllObjects: boolean; // New prop
+  onSetAllowScriptingOnAllObjects: (enabled: boolean) => void; // New prop
 }
 
 const Layout: React.FC<LayoutProps> = ({
@@ -42,9 +44,11 @@ const Layout: React.FC<LayoutProps> = ({
   onOpenSettingsModal,
   onCloseSettingsModal,
   onSetMagicEnabled,
-  onAddObject, // Add this line
+  onAddObject,
   onDeleteObject,
-  onUpdateCardDimensions, // Add this line
+  onUpdateCardDimensions,
+  allowScriptingOnAllObjects,
+  onSetAllowScriptingOnAllObjects,
 }) => {
   const currentCard = stack.cards.find(card => card.id === stack.currentCardId);
 
@@ -82,14 +86,17 @@ const Layout: React.FC<LayoutProps> = ({
             onDeleteObject={onDeleteObject} // Pass new prop
             onUpdateCardDimensions={onUpdateCardDimensions} // Pass new prop
             currentCard={currentCard} // Pass currentCard
+            allowScriptingOnAllObjects={allowScriptingOnAllObjects} // New prop
           />
         </Grid>
       </Grid>
       {/* Settings Modal */}
-      <SettingsModal
+      <SettingsModalComponent
         isOpen={isSettingsModalOpen}
         onClose={onCloseSettingsModal}
         onSetMagicEnabled={onSetMagicEnabled}
+        allowScriptingOnAllObjects={allowScriptingOnAllObjects} // New prop
+        onSetAllowScriptingOnAllObjects={onSetAllowScriptingOnAllObjects} // New prop
       />
     </Box>
   );

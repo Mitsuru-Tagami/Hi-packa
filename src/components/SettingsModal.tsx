@@ -10,16 +10,21 @@ import type { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import i18next from '../i18n';
+import i18next, { t } from '../i18n';
 import IconButton from '@mui/material/IconButton'; // Import IconButton
 import InputAdornment from '@mui/material/InputAdornment'; // Import InputAdornment
 import Visibility from '@mui/icons-material/Visibility'; // Import Visibility icon
 import VisibilityOff from '@mui/icons-material/VisibilityOff'; // Import VisibilityOff icon
+import FormControlLabel from '@mui/material/FormControlLabel'; // Import FormControlLabel
+import Switch from '@mui/material/Switch'; // Import Switch
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSetMagicEnabled: (enabled: boolean) => void;
+  allowScriptingOnAllObjects: boolean; // New prop
+  onSetAllowScriptingOnAllObjects: (enabled: boolean) => void; // New prop
+  isMagicEnabled: boolean; // New prop
 }
 
 const style = {
@@ -27,27 +32,36 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
+  width: 550,
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
   p: 4,
 };
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSetMagicEnabled }) => {
+const SettingsModal: React.FC<SettingsModalProps> = ({
+  isOpen,
+  onClose,
+  onSetMagicEnabled,
+  allowScriptingOnAllObjects, // New prop
+  onSetAllowScriptingOnAllObjects,
+  isMagicEnabled, // Add this prop
+}) => {
   const [magicInput, setMagicInput] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false); // New state for password visibility
   const [selectedLanguage, setSelectedLanguage] = useState(i18next.language); // New state for language
-  const MAGIC_WORD = 'Magic'; // Define the magic word
+  const MAGIC_WORD = 'magic'; // Define the magic word (changed to lowercase)
 
   const handleUnlock = () => {
     if (magicInput === MAGIC_WORD) {
       onSetMagicEnabled(true);
-      onClose();
-      alert('魔法が解き放たれました！'); // Changed alert message
+      alert(t('settingsModal.unlockedAlert')); // Temporarily re-enabled alert
+      setTimeout(() => {
+        onClose();
+      }, 100); // Close after a short delay
     } else {
-      setError('Incorrect magic word.');
+      setError(t('settingsModal.incorrectMagicWord'));
     }
   };
 
@@ -81,28 +95,41 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSetMag
     >
       <Box sx={style}>
         <Typography id="settings-modal-title" variant="h6" component="h2" gutterBottom>
-          Settings
+          {t('settingsModal.title')}
         </Typography>
 
         {/* Language Selector */}
         <FormControl fullWidth margin="normal">
-          <InputLabel id="language-select-label">Language</InputLabel>
+          <InputLabel id="language-select-label">{t('settingsModal.language')}</InputLabel>
           <Select
             labelId="language-select-label"
             value={selectedLanguage}
-            label="Language"
+            label={t('settingsModal.language')}
             onChange={handleLanguageChange}
           >
-            <MenuItem value="ja">日本語</MenuItem>
-            <MenuItem value="en">English</MenuItem>
+            <MenuItem value="ja">{t('settingsModal.languageJa')}</MenuItem>
+            <MenuItem value="en">{t('settingsModal.languageEn')}</MenuItem>
           </Select>
         </FormControl>
 
+        {/* Allow Scripting on All Objects Toggle - Moved and controlled by magic */}
+        <FormControlLabel
+          sx={{ mt: 2, display: 'block' }} // Removed color here
+          control={
+            <Switch
+              checked={allowScriptingOnAllObjects}
+              onChange={(e) => onSetAllowScriptingOnAllObjects(e.target.checked)}
+              disabled={!isMagicEnabled} // Disabled if magic is not enabled
+            />
+          }
+          label={<Typography sx={{ color: 'rgba(0, 0, 0, 0.87)' }}>{t('settingsModal.allowScriptingOnAllObjects')}</Typography>}
+        />
+
         <Typography id="settings-modal-description" sx={{ mt: 2 }}>
-          Enter the magic word to unlock advanced scripting features.
+          {t('settingsModal.magicWordPrompt')}
         </Typography>
         <TextField
-          label="Magic Word"
+          label={t('settingsModal.magicWordLabel')}
           type={showPassword ? 'text' : 'password'} // Toggle type based on showPassword
           fullWidth
           margin="normal"
@@ -118,19 +145,18 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSetMag
           }}
           InputProps={{ // Add InputProps for adornment
             endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                  edge="end"
-                >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
+              <IconButton
+                aria-label={t('settingsModal.togglePasswordVisibility')}
+                onClick={handleClickShowPassword}
+                onMouseDown={handleMouseDownPassword}
+                edge="end"
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
             ),
           }}
         />
+
         {error && (
           <Alert severity="error" sx={{ mt: 1 }}>
             {error}
@@ -138,10 +164,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSetMag
         )}
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
           <Button variant="outlined" onClick={handleClose}>
-            Cancel
+            {t('settingsModal.cancelButton')}
           </Button>
           <Button variant="contained" onClick={handleUnlock}>
-            Unlock
+            {t('settingsModal.unlockButton')}
           </Button>
         </Box>
       </Box>
@@ -149,4 +175,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onSetMag
   );
 };
 
-export default SettingsModal;
+export const SettingsModalComponent = SettingsModal; // Changed from default export
+
+// export default SettingsModal; // Commented out default export

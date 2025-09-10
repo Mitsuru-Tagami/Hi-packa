@@ -4,6 +4,7 @@ import type { Stack, StackObject, ObjectType } from '../types'; // Import Object
 import { StackObjectNode } from './StackObjectNode';
 import Menu from '@mui/material/Menu'; // Import Menu
 import MenuItem from '@mui/material/MenuItem'; // Import MenuItem
+import { t } from '../i18n';
 
 interface CardCanvasProps {
   stack: Stack;
@@ -100,9 +101,9 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
           contextMenuPos ? { top: contextMenuPos.y, left: contextMenuPos.x } : undefined
         }
       >
-        <MenuItem onClick={() => handleAddObjectMenuItem('button')}>Add Button</MenuItem>
-        <MenuItem onClick={() => handleAddObjectMenuItem('text')}>Add Text Box</MenuItem>
-        <MenuItem onClick={() => handleAddObjectMenuItem('image')}>Add Image</MenuItem>
+        <MenuItem onClick={() => handleAddObjectMenuItem('button')}>{t('contextMenu.addButton')}</MenuItem>
+        <MenuItem onClick={() => handleAddObjectMenuItem('text')}>{t('contextMenu.addTextBox')}</MenuItem>
+        <MenuItem onClick={() => handleAddObjectMenuItem('image')}>{t('contextMenu.addImage')}</MenuItem>
       </Menu>
     </React.Fragment>
   );

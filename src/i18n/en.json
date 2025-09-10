@@ -56,6 +56,7 @@
     "defaultTextBoxText": "Text Box",
     "newButton": "New Button",
     "newTextBox": "New Text Box",
+    "newImage": "New Image",
     "contextMenuAddButton": "Add Button",
     "contextMenuAddText": "Add Text",
     "contextMenuAddImage": "Add Image",
@@ -67,6 +68,8 @@
     "runMode": "Run",
     "editMode": "Edit",
     "exportHtml": "Export HTML",
+    "cards": "Cards",
+    "mode": "Mode",
     "propertiesPanel": {
       "title": "Properties Panel",
       "selectedObjectLabel": "Selected Object: {{id}} ({{type}})",
@@ -83,7 +86,45 @@
       "positionX": "X",
       "positionY": "Y",
       "width": "Width",
-      "height": "Height"
+      "height": "Height",
+      "imageSourceUrl": "Image Source (URL)",
+      "objectFit": "Object Fit",
+      "fitContain": "Contain",
+      "fitFill": "Fill",
+      "backgroundColor": "Background Color",
+      "transparentBackground": "Transparent Background",
+      "borderColor": "Border Color",
+      "borderWidth": "Border Width",
+      "borderNone": "None",
+      "borderThin": "Thin",
+      "borderMedium": "Medium",
+      "borderThick": "Thick",
+      "scriptLabel": "Script (JavaScript)",
+      "scriptPlaceholder": "Enter JavaScript code here...",
+      "cardPropertiesLabel": "Card Properties: {{name}} ({{id}})",
+      "cardSize": "Card Size",
+      "sizeCustom": "Custom",
+      "customWidth": "Custom Width",
+      "customHeight": "Custom Height"
+    },
+    "settingsModal": {
+      "title": "Settings",
+      "language": "Language",
+      "languageJa": "日本語",
+      "languageEn": "English",
+      "magicWordPrompt": "Enter the magic word to unlock advanced scripting features.",
+      "magicWordLabel": "Magic Word",
+      "togglePasswordVisibility": "toggle password visibility",
+      "incorrectMagicWord": "Incorrect magic word.",
+      "cancelButton": "Cancel",
+      "unlockButton": "Unlock",
+      "unlockedAlert": "Unlocked!",
+      "allowScriptingOnAllObjects": "Allow scripting on all objects"
+    },
+    "contextMenu": {
+      "addButton": "Add Button",
+      "addTextBox": "Add Text Box",
+      "addImage": "Add Image"
     }
   }
 }

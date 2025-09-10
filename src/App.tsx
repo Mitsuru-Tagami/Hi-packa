@@ -10,6 +10,7 @@ function App() {
   const [isRunMode, setIsRunMode] = useState<boolean>(false);
   const [isMagicEnabled, setIsMagicEnabled] = useState<boolean>(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false);
+  const [allowScriptingOnAllObjects, setAllowScriptingOnAllObjects] = useState<boolean>(false); // New state
 
   const handleSwitchCard = (cardId: string) => {
     // When switching cards, also deselect any selected object
@@ -119,7 +120,7 @@ function App() {
         id: `obj-${Date.now()}`,
         type,
         x, y, width: 100, height: 50,
-        text: type === 'button' ? t('newButton') : t('newTextBox'),
+        text: type === 'button' ? t('newButton') : (type === 'text' ? t('newTextBox') : t('newImage')),
         textAlign: 'center',
         borderWidth: 'thin',
         script: '',
@@ -216,6 +217,8 @@ function App() {
       onAddObject={handleAddObject}
       onDeleteObject={handleDeleteObject}
       onUpdateCardDimensions={handleUpdateCardDimensions}
+      allowScriptingOnAllObjects={allowScriptingOnAllObjects} // New prop
+      onSetAllowScriptingOnAllObjects={setAllowScriptingOnAllObjects} // New prop
     />
   );
 }
