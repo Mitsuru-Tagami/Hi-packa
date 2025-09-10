@@ -14,9 +14,17 @@ interface CardListPanelProps {
   isRunMode: boolean;
   onToggleRunMode: () => void;
   onOpenSettingsModal: () => void; // New prop
+  onAddCard: () => void; // New prop
 }
 
-const CardListPanel: React.FC<CardListPanelProps> = ({ stack, onSwitchCard, isRunMode, onToggleRunMode, onOpenSettingsModal }) => {
+const CardListPanel: React.FC<CardListPanelProps> = ({
+  stack,
+  onSwitchCard,
+  isRunMode,
+  onToggleRunMode,
+  onOpenSettingsModal,
+  onAddCard, // Destructure new prop
+}) => {
   return (
     <Box sx={{ borderRight: '1px solid #ddd', height: '100vh', p: 2 }}>
       <Typography variant="h6" gutterBottom>
@@ -53,6 +61,15 @@ const CardListPanel: React.FC<CardListPanelProps> = ({ stack, onSwitchCard, isRu
           fullWidth
         >
           {t('settings')}
+        </Button>
+      </Box>
+      <Box sx={{ mt: 1 }}> {/* Added margin top for spacing */}
+        <Button
+          variant="contained" // Use contained for primary action
+          onClick={onAddCard}
+          fullWidth
+        >
+          {t('addCardButton')}
         </Button>
       </Box>
       {/* Add other controls like "Export HTML" here later */}

@@ -10,7 +10,7 @@ function App() {
   const [isRunMode, setIsRunMode] = useState<boolean>(false);
   const [isMagicEnabled, setIsMagicEnabled] = useState<boolean>(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false);
-  const [allowScriptingOnAllObjects, setAllowScriptingOnAllObjects] = useState<boolean>(false); // New state
+  const [allowScriptingOnAllObjects, setAllowScriptingOnAllObjects] = useState<boolean>(true); // 常にON
 
   const handleSwitchCard = (cardId: string) => {
     // When switching cards, also deselect any selected object
@@ -198,6 +198,33 @@ function App() {
     });
   };
 
+  const handleAddCard = () => {
+    setStack(prevStack => {
+      const newCardId = `card-${Date.now()}`;
+      const newCard = {
+        id: newCardId,
+        name: t('newCardName', { number: prevStack.cards.length + 1 }), // Use translation for new card name
+        width: 414, // Default width
+        height: 736, // Default height
+        objects: [],
+      };
+      return {
+        ...prevStack,
+        cards: [...prevStack.cards, newCard],
+        currentCardId: newCardId, // Switch to the new card
+      };
+    });
+  };
+
+  const handleUpdateCardName = (cardId: string, newName: string) => {
+    setStack(prevStack => ({
+      ...prevStack,
+      cards: prevStack.cards.map(card =>
+        card.id === cardId ? { ...card, name: newName } : card
+      ),
+    }));
+  };
+
   return (
     <Layout
       stack={stack}
@@ -219,6 +246,8 @@ function App() {
       onUpdateCardDimensions={handleUpdateCardDimensions}
       allowScriptingOnAllObjects={allowScriptingOnAllObjects} // New prop
       onSetAllowScriptingOnAllObjects={setAllowScriptingOnAllObjects} // New prop
+      onAddCard={handleAddCard} // New prop
+      onUpdateCardName={handleUpdateCardName} // New prop
     />
   );
 }

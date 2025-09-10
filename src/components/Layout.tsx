@@ -27,6 +27,8 @@ interface LayoutProps {
   onUpdateCardDimensions: (cardId: string, width: number, height: number) => void; // New prop
   allowScriptingOnAllObjects: boolean; // New prop
   onSetAllowScriptingOnAllObjects: (enabled: boolean) => void; // New prop
+  onAddCard: () => void; // New prop
+  onUpdateCardName: (cardId: string, newName: string) => void; // New prop
 }
 
 const Layout: React.FC<LayoutProps> = ({
@@ -49,6 +51,8 @@ const Layout: React.FC<LayoutProps> = ({
   onUpdateCardDimensions,
   allowScriptingOnAllObjects,
   onSetAllowScriptingOnAllObjects,
+  onAddCard,
+  onUpdateCardName, // New prop
 }) => {
   const currentCard = stack.cards.find(card => card.id === stack.currentCardId);
 
@@ -62,6 +66,7 @@ const Layout: React.FC<LayoutProps> = ({
             isRunMode={isRunMode}
             onToggleRunMode={onToggleRunMode}
             onOpenSettingsModal={onOpenSettingsModal}
+            onAddCard={onAddCard} // New prop
           />
         </Grid>
         <Grid item xs={6} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -87,6 +92,7 @@ const Layout: React.FC<LayoutProps> = ({
             onUpdateCardDimensions={onUpdateCardDimensions} // Pass new prop
             currentCard={currentCard} // Pass currentCard
             allowScriptingOnAllObjects={allowScriptingOnAllObjects} // New prop
+            onUpdateCardName={onUpdateCardName} // New prop
           />
         </Grid>
       </Grid>

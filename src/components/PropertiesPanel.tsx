@@ -35,6 +35,21 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   currentCard,
   allowScriptingOnAllObjects, // New prop
 }) => {
+  // Card関連のローカルステート
+  const [localCardName, setLocalCardName] = useState<string>(currentCard?.name || '');
+  const [localCardWidth, setLocalCardWidth] = useState<string>(currentCard?.width ? currentCard.width.toString() : '');
+  const [localCardHeight, setLocalCardHeight] = useState<string>(currentCard?.height ? currentCard.height.toString() : '');
+  const [selectedSizeLabel, setSelectedSizeLabel] = useState<string>('');
+  // Card名更新関数（props経由で更新する場合は適宜修正）
+  const onUpdateCardName = (cardId: string, name: string) => {
+    // ここでpropsの更新関数を呼ぶ
+  };
+  // currentCardの変更時にlocalCardName等を更新
+  useEffect(() => {
+    setLocalCardName(currentCard?.name || '');
+    setLocalCardWidth(currentCard?.width ? currentCard.width.toString() : '');
+    setLocalCardHeight(currentCard?.height ? currentCard.height.toString() : '');
+  }, [currentCard]);
   // Local state to manage input field values
   const [localX, setLocalX] = useState<string>('');
   const [localY, setLocalY] = useState<string>('');
@@ -50,11 +65,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   const [localSrc, setLocalSrc] = useState<string>(''); // New local state for image source
   const [localObjectFit, setLocalObjectFit] = useState<'contain' | 'fill'>('contain'); // New local state for object fit
   const [isTransparentBackground, setIsTransparentBackground] = useState<boolean>(false); // New local state for transparency
-  const [localCardWidth, setLocalCardWidth] = useState<string>(''); // New local state for card width
-  const [localCardHeight, setLocalCardHeight] = useState<string>(''); // New local state for card height
-  const [selectedSizeLabel, setSelectedSizeLabel] = useState<string>(''); // New state for selected predefined size
 
-  // Update local state when selectedObject changes
   useEffect(() => {
     if (selectedObject) {
       setLocalX(selectedObject.x.toFixed(2));
@@ -93,11 +104,12 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
       setIsTransparentBackground(false);
       // Initialize card dimensions
       if (currentCard) {
-                setLocalCardHeight(currentCard.height.toString());
-                const matchedSize = PREDEFINED_CARD_SIZES.find(
-                  size => size.width === currentCard.width && size.height === currentCard.height
-                );
-                setSelectedSizeLabel(matchedSize ? matchedSize.label : 'Custom');      } else {
+        setLocalCardHeight(currentCard.height.toString());
+        const matchedSize = PREDEFINED_CARD_SIZES.find(
+          size => size.width === currentCard.width && size.height === currentCard.height
+        );
+        setSelectedSizeLabel(matchedSize ? matchedSize.label : 'Custom');
+      } else {
         setLocalCardWidth('');
         setLocalCardHeight('');
       }
@@ -118,8 +130,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   };
 
   const handleNumberInputBlur = (key: keyof StackObject, rawValue: string) => {
-    const pixelValue = parseUnitValue(rawValue);
-
+  const pixelValue = parseUnitValue(rawValue);
     if (!isNaN(pixelValue)) {
       handlePropertyChange(key, pixelValue);
     } else {
@@ -352,105 +363,128 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               placeholder={t('propertiesPanel.scriptPlaceholder')}
               disabled={!isMagicEnabled} // Disable if magic is not enabled
             />
-          )}
-
-          {/* Delete Button */}
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => {
-              if (selectedObject && window.confirm(t('propertiesPanel.deleteConfirmation', { type: selectedObject.type, id: selectedObject.id }))) {
-                onDeleteObject(selectedObject.id);
-              }
-            }}
-            sx={{ mt: 3 }} // Margin top for spacing
-            className="delete-btn" // Apply the CSS class
-          >
-            {t('propertiesPanel.deleteButton')}
-          </Button>
-        </Box>
-      ) : (
-        // UI for card properties when no object is selected
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Typography variant="subtitle1">
-            {t('propertiesPanel.cardPropertiesLabel', { name: currentCard?.name, id: currentCard?.id })}
-          </Typography>
-
-          <FormControl fullWidth margin="normal">
-            <InputLabel id="card-size-select-label">{t('propertiesPanel.cardSize')}</InputLabel>
-            <Select
-              labelId="card-size-select-label"
-              value={selectedSizeLabel}
-              label={t('propertiesPanel.cardSize')}
-              onChange={(e) => {
-                const newLabel = e.target.value;
-                setSelectedSizeLabel(newLabel);
-                if (newLabel === 'Custom') {
-                  // User will manually enter width/height if Custom is selected
-                  // For now, do nothing, or clear inputs if desired
-                } else {
-                  const selectedSize = PREDEFINED_CARD_SIZES.find(size => size.label === newLabel);
-                  if (selectedSize && currentCard) {
-                    onUpdateCardDimensions(currentCard.id, selectedSize.width, selectedSize.height);
-                  }
-                }
-              }}
-            >
-              {PREDEFINED_CARD_SIZES.map((size) => (
-                <MenuItem key={size.label} value={size.label}>
-                  {size.label === 'Custom' ? t('propertiesPanel.sizeCustom') : size.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Show manual input fields only if 'Custom' is selected */}
-          {selectedSizeLabel === 'Custom' && (
-            <>
-              <TextField
-                label={t('propertiesPanel.customWidth')}
-                value={localCardWidth}
-                onChange={(e) => setLocalCardWidth(e.target.value)}
-                onBlur={(e) => {
-                  if (currentCard) {
-                    const newWidth = parseInt(e.target.value);
-                    if (!isNaN(newWidth)) {
-                      onUpdateCardDimensions(currentCard.id, newWidth, currentCard.height);
-                    } else {
-                      setLocalCardWidth(currentCard.width.toString()); // Revert on invalid input
-                    }
-                  }
-                }}
-                fullWidth
-                size="small"
-                InputProps={{
-                  endAdornment: <InputAdornment position="end">px</InputAdornment>,
-                }}
-              />
-              <TextField
-                label={t('propertiesPanel.customHeight')}
-                value={localCardHeight}
-                onChange={(e) => setLocalCardHeight(e.target.value)}
-                onBlur={(e) => {
-                  if (currentCard) {
-                    const newHeight = parseInt(e.target.value);
-                    if (!isNaN(newHeight)) {
-                      onUpdateCardDimensions(currentCard.id, currentCard.width, newHeight);
-                    } else {
-                      setLocalCardHeight(currentCard.height.toString()); // Revert on invalid input
-                    }
-                  }
-                }}
-                fullWidth
-                size="small"
-                InputProps={{
-                  endAdornment: <InputAdornment position="end">px</InputAdornment>,
-                }}
-              />
-            </>
-          )}
-        </Box>
-      )}
-    </Box>
-  );
-};
+           )}
+ 
+           {/* Delete Button */}
+           <Button
+             variant="contained"
+             color="error"
+             onClick={() => {
+               if (selectedObject && window.confirm(t(
+                 'propertiesPanel.deleteConfirmation', { type: selectedObject.type, id: selectedObject.id }
+               ))) {
+                 onDeleteObject(selectedObject.id);
+               }
+             }}
+           >
+             {t('propertiesPanel.deleteButton')}
+           </Button>
+         </Box>
+       ) : (
+         // UI for card properties when no object is selected
+         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+           <Typography variant="subtitle1">
+             {t('propertiesPanel.cardPropertiesLabel', { name:
+ currentCard?.name, id: currentCard?.id })}
+           </Typography>
+ 
+           {/* Card Name TextField */}
+           {currentCard && (
+             <TextField
+               label={t('propertiesPanel.cardNameLabel')}
+               value={localCardName}
+               onChange={(e) => setLocalCardName(e.target.value)}
+               onBlur={(e) => onUpdateCardName(currentCard.id, e.target.value)}
+               fullWidth
+               size="small"
+             />
+           )}
+ 
+           <FormControl fullWidth margin="normal">
+             <InputLabel id="card-size-select-label">{t(
+ 'propertiesPanel.cardSize')}</InputLabel>
+             <Select
+               labelId="card-size-select-label"
+               value={selectedSizeLabel}
+               label={t('propertiesPanel.cardSize')}
+               onChange={(e) => {
+                 const newLabel = e.target.value;
+                 setSelectedSizeLabel(newLabel);
+                 if (newLabel === 'Custom') {
+                   // User will manually enter width/height if Custom 
+                   // For now, do nothing, or clear inputs if desired
+                 } else {
+                   const selectedSize = PREDEFINED_CARD_SIZES.find((size) => size.label === newLabel);
+                   if (selectedSize && currentCard) {
+                     onUpdateCardDimensions(currentCard.id,
+ selectedSize.width, selectedSize.height);
+                   }
+                 }
+               }}
+             >
+               {PREDEFINED_CARD_SIZES.map((size) => (
+                 <MenuItem key={size.label} value={size.label}>
+                   {size.label === 'Custom' ? t(
+ 'propertiesPanel.sizeCustom') : size.label}
+                 </MenuItem>
+               ))}
+             </Select>
+           </FormControl>
+ 
+           {/* Show manual input fields only if 'Custom' is selected */
+ }
+           {selectedSizeLabel === 'Custom' && (
+             <>
+               <TextField
+                 label={t('propertiesPanel.customWidth')}
+                 value={localCardWidth}
+                 onChange={(e) => setLocalCardWidth(e.target.value)}
+                 onBlur={(e) => {
+                   if (currentCard) {
+                     const newWidth = parseInt(e.target.value);
+                     if (!isNaN(newWidth)) {
+                       onUpdateCardDimensions(currentCard.id, newWidth,
+ currentCard.height);
+                     } else {
+                       setLocalCardWidth(currentCard.width.toString());
+ // Revert on invalid input
+                     }
+                   }
+                 }}
+                 fullWidth
+                 size="small"
+                 InputProps={{
+                   endAdornment: <InputAdornment position="end">px</
+ InputAdornment>,
+                 }}
+               />
+               <TextField
+                 label={t('propertiesPanel.customHeight')}
+                 value={localCardHeight}
+                 onChange={(e) => setLocalCardHeight(e.target.value)}
+                 onBlur={(e) => {
+                   if (currentCard) {
+                     const newHeight = parseInt(e.target.value);
+                     if (!isNaN(newHeight)) {
+                       onUpdateCardDimensions(currentCard.id,
+ currentCard.width, newHeight);
+                     } else {
+                       setLocalCardHeight(currentCard.height.toString
+ ()); // Revert on invalid input
+                     }
+                   }
+                 }}
+                 fullWidth
+                 size="small"
+                 InputProps={{
+                   endAdornment: <InputAdornment position="end">px</
+ InputAdornment>,
+                 }}
+               />
+             </>
+           )}
+         </Box>
+       )}
+     </Box>
+   );
+}

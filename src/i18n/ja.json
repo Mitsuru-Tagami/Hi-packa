@@ -51,6 +51,7 @@
     "scriptOnClick": "スクリプト (onclick)",
     "magicPlaceholder": "編集するには 'Magic' と入力...",
     "addNewCard": "+ 新しいカード",
+    "addCardButton": "カードを追加",
     "newCardName": "カード {{number}}",
     "defaultButtonText": "ボタン",
     "defaultTextBoxText": "テキストボックス",

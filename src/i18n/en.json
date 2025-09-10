@@ -51,6 +51,7 @@
     "scriptOnClick": "Script (onclick)",
     "magicPlaceholder": "To edit, type 'Magic'...",
     "addNewCard": "+ New Card",
+    "addCardButton": "Add Card",
     "newCardName": "Card {{number}}",
     "defaultButtonText": "Button",
     "defaultTextBoxText": "Text Box",
