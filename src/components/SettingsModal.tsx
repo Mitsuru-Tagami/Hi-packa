@@ -23,7 +23,6 @@ interface SettingsModalProps {
   onClose: () => void;
   onSetMagicEnabled: (enabled: boolean) => void;
   allowScriptingOnAllObjects: boolean; // New prop
-  onSetAllowScriptingOnAllObjects: (enabled: boolean) => void; // New prop
   isMagicEnabled: boolean; // New prop
 }
 
@@ -42,10 +41,7 @@ const style = {
 const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
-  onSetMagicEnabled,
-  allowScriptingOnAllObjects, // New prop
-  onSetAllowScriptingOnAllObjects,
-  isMagicEnabled, // Add this prop
+  onSetMagicEnabled,  isMagicEnabled, // Add this prop
 }) => {
   const [magicInput, setMagicInput] = useState('');
   const [error, setError] = useState('');
@@ -117,8 +113,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           sx={{ mt: 2, display: 'block' }} // Removed color here
           control={
             <Switch
-              checked={allowScriptingOnAllObjects}
-              onChange={(e) => onSetAllowScriptingOnAllObjects(e.target.checked)}
+              checked={selectedObject.type === 'script'}
+              onChange={(e) => (e.target.checked)}
               disabled={!isMagicEnabled} // Disabled if magic is not enabled
             />
           }

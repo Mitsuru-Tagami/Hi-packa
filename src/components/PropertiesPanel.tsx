@@ -1,18 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import InputAdornment from '@mui/material/InputAdornment';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import FormControlLabel from '@mui/material/FormControlLabel'; // Import FormControlLabel
-import Switch from '@mui/material/Switch'; // Import Switch
-import Button from '@mui/material/Button'; // Import Button
 import type { StackObject, BorderWidth, TextAlign, Card, Stack } from '../types';
-import { parseUnitValue } from '../utils';
-import { t } from '../i18n';
+
+// Remove invalid export and move these state declarations inside the PropertiesPanel component below.
 
 interface PropertiesPanelProps {
   selectedObject: StackObject | null;
@@ -22,22 +11,20 @@ interface PropertiesPanelProps {
   onDeleteObject: (objectId: string) => void;
   onUpdateCardDimensions: (cardId: string, width: number, height: number) => void; // New prop
   currentCard: Card | null; // New prop
-  allowScriptingOnAllObjects: boolean; // New prop
   onDeleteCard: (cardId: string) => void; // New prop for card deletion
   stack: Stack; // Stack型推奨
+}
+
+// Hide the panel completely if in run mode
+export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpdateObject, isRunMode, isMagicEnabled, onDeleteObject, onUpdateCardDimensions, currentCard, onDeleteCard, stack }) => {
+  // Card関連のローカルステート
+  const [localCardName, setLocalCardName] = useState<string>(currentCard?.name || '');
+  const [localCardWidth, setLocalCardWidth] = useState<string>(currentCard?.width ? currentCard.width.toString() : '');
+  const [localCardHeight, setLocalCardHeight] = useState<string>(currentCard?.height ? currentCard.height.toString() : '');
+  const [selectedSizeLabel, setSelectedSizeLabel] = useState<string>('');
 
   useEffect(() => {
     if (selectedObject) {
-      setLocalX(selectedObject.x.toFixed(2));
-      setLocalY(selectedObject.y.toFixed(2));
-      setLocalWidth(selectedObject.width.toFixed(2));
-      setLocalHeight(selectedObject.height.toFixed(2));
-      setLocalText(selectedObject.text);
-      setLocalScript(selectedObject.script || '');
-      setLocalBorderColor(selectedObject.borderColor || '#000000');
-      setLocalBorderWidth(selectedObject.borderWidth || 'none');
-      setLocalTextAlign(selectedObject.textAlign || 'left');
-      setLocalColor(selectedObject.color || '#000000'); // Default to black if not set
       setLocalSrc(selectedObject.src || '');
       setLocalObjectFit(selectedObject.objectFit || 'contain');
 
@@ -47,12 +34,28 @@ interface PropertiesPanelProps {
         setLocalBackgroundColor('#ffffff'); // Default color when transparent is checked
       } else {
         setIsTransparentBackground(false);
-        setLocalBackgroundColor(selectedObject.backgroundColor || '#ffffff'); // Default to white if not set
-      }
-    } else {
-      // Clear local state if no object is selected
-      setLocalX('');
-      setLocalY('');
+export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpdateObject, isRunMode, isMagicEnabled, onDeleteObject, onUpdateCardDimensions, currentCard, onDeleteCard, stack }) => {
+  // Object関連のローカルステート
+  const [localX, setLocalX] = useState<string>('');
+  const [localY, setLocalY] = useState<string>('');
+  const [localWidth, setLocalWidth] = useState<string>('');
+  const [localHeight, setLocalHeight] = useState<string>('');
+  const [localText, setLocalText] = useState<string>('');
+  const [localScript, setLocalScript] = useState<string>('');
+  const [localBorderColor, setLocalBorderColor] = useState<string>('');
+  const [localBorderWidth, setLocalBorderWidth] = useState<BorderWidth>('none');
+  const [localTextAlign, setLocalTextAlign] = useState<TextAlign>('left');
+  const [localBackgroundColor, setLocalBackgroundColor] = useState<string>(''); // New local state for background color
+  const [localColor, setLocalColor] = useState<string>(''); // New local state for text color
+  const [localSrc, setLocalSrc] = useState<string>(''); // New local state for image source
+  const [localObjectFit, setLocalObjectFit] = useState<'contain' |'fill'>('contain'); // New local state for object fit
+  const [isTransparentBackground, setIsTransparentBackground] = useState<boolean>(false); // New local state for transparency
+
+  // Card関連のローカルステート
+  const [localCardName, setLocalCardName] = useState<string>(currentCard?.name || '');
+  const [localCardWidth, setLocalCardWidth] = useState<string>(currentCard?.width ? currentCard.width.toString() : '');
+  const [localCardHeight, setLocalCardHeight] = useState<string>(currentCard?.height ? currentCard.height.toString() : '');
+  const [selectedSizeLabel, setSelectedSizeLabel] = useState<string>('');
       setLocalWidth('');
       setLocalHeight('');
       setLocalText('');
@@ -129,18 +132,6 @@ interface PropertiesPanelProps {
     { label: 'Desktop (1280x720)', width: 1280, height: 720 },
     { label: 'Custom', width: 0, height: 0 }, // Placeholder for custom input
   ];
-  
-  // Hide the panel completely if in run mode
-export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ selectedObject, onUpdateObject, isRunMode, isMagicEnabled, onDeleteObject, onUpdateCardDimensions, currentCard, allowScriptingOnAllObjects, onDeleteCard, stack }) => {
-  // Card関連のローカルステート
-  const [localCardName, setLocalCardName] = useState<string>(currentCard?.name || '');
-  const [localCardWidth, setLocalCardWidth] = useState<string>(currentCard?.width ? currentCard.width.toString() : '');
-  const [localCardHeight, setLocalCardHeight] = useState<string>(currentCard?.height ? currentCard.height.toString() : '');
-  const [selectedSizeLabel, setSelectedSizeLabel] = useState<string>('');
-  useEffect(() => {
-    setLocalCardName(currentCard?.name || '');
-    setLocalCardWidth(currentCard?.width ? currentCard.width.toString() : '');
-    setLocalCardHeight(currentCard?.height ? currentCard.height.toString() : '');
-  }, [currentCard]);
-  // ...既存の関数本体・return文...
 }
+
+// Remove this duplicate component definition and keep only the first, fully implemented PropertiesPanel component above.

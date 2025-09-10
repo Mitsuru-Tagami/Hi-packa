@@ -119,8 +119,7 @@
       "incorrectMagicWord": "魔法の言葉が違います。",
       "cancelButton": "キャンセル",
       "unlockButton": "ロック解除",
-      "unlockedAlert": "解錠！",
-      "allowScriptingOnAllObjects": "全てのオブジェクトでスクリプトを許可"
+      "unlockedAlert": "解錠！"
     },
     "contextMenu": {
       "addButton": "ボタンを追加",

@@ -10,8 +10,6 @@ function App() {
   const [isRunMode, setIsRunMode] = useState<boolean>(false);
   const [isMagicEnabled, setIsMagicEnabled] = useState<boolean>(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false);
-  const [allowScriptingOnAllObjects, setAllowScriptingOnAllObjects] = useState<boolean>(true); // 常にON
-
   const handleSwitchCard = (cardId: string) => {
     // When switching cards, also deselect any selected object
     setSelectedObject(null);
@@ -260,8 +258,6 @@ function App() {
       onDeleteObject={handleDeleteObject}
       onDeleteCard={handleDeleteCard} // New prop
       onUpdateCardDimensions={handleUpdateCardDimensions}
-      allowScriptingOnAllObjects={allowScriptingOnAllObjects} // New prop
-      onSetAllowScriptingOnAllObjects={setAllowScriptingOnAllObjects} // New prop
       onAddCard={handleAddCard} // New prop
       onUpdateCardName={handleUpdateCardName} // New prop
     />

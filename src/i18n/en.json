@@ -119,8 +119,7 @@
       "incorrectMagicWord": "Incorrect magic word.",
       "cancelButton": "Cancel",
       "unlockButton": "Unlock",
-      "unlockedAlert": "Unlocked!",
-      "allowScriptingOnAllObjects": "Allow scripting on all objects"
+      "unlockedAlert": "Unlocked!"
     },
     "contextMenu": {
       "addButton": "Add Button",

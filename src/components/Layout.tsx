@@ -25,7 +25,6 @@ interface LayoutProps {
   onAddObject: (type: ObjectType, x: number, y: number) => void; // New prop
   onDeleteObject: (objectId: string) => void; // New prop
   onUpdateCardDimensions: (cardId: string, width: number, height: number) => void; // New prop
-  allowScriptingOnAllObjects: boolean; // New prop
   onSetAllowScriptingOnAllObjects: (enabled: boolean) => void; // New prop
   onAddCard: () => void; // New prop
   onUpdateCardName: (cardId: string, newName: string) => void; // New prop
@@ -50,8 +49,6 @@ const Layout: React.FC<LayoutProps> = ({
   onAddObject,
   onDeleteObject,
   onUpdateCardDimensions,
-  allowScriptingOnAllObjects,
-  onSetAllowScriptingOnAllObjects,
   onAddCard,
   onUpdateCardName, // New prop
   onDeleteCard, // New prop for card deletion
@@ -94,7 +91,6 @@ const Layout: React.FC<LayoutProps> = ({
             onDeleteObject={onDeleteObject} // Pass new prop
             onUpdateCardDimensions={onUpdateCardDimensions} // Pass new prop
             currentCard={currentCard} // Pass currentCard
-            allowScriptingOnAllObjects={allowScriptingOnAllObjects} // New prop
             onDeleteCard={onDeleteCard} // Pass card delete handler
           />
         </Grid>
@@ -104,8 +100,6 @@ const Layout: React.FC<LayoutProps> = ({
         isOpen={isSettingsModalOpen}
         onClose={onCloseSettingsModal}
         onSetMagicEnabled={onSetMagicEnabled}
-        allowScriptingOnAllObjects={allowScriptingOnAllObjects} // New prop
-        onSetAllowScriptingOnAllObjects={onSetAllowScriptingOnAllObjects} // New prop
       />
     </Box>
   );
