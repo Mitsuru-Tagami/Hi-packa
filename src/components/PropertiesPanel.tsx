@@ -179,15 +179,13 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
   return (
     <div style={{ padding: '16px', height: '100%', overflow: 'auto' }}>
-      <h3>Properties</h3>
-      
       {/* Card Properties Section */}
       {currentCard && (
         <div style={{ marginBottom: '24px', padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}>
-          <h4>Card Properties</h4>
+          <h4>{t('propertiesPanel.cardProperties')}</h4>
           
           <div style={{ marginBottom: '12px' }}>
-            <label>Card Name:</label>
+            <label>{t('propertiesPanel.cardName')}:</label>
             <input
               type="text"
               value={localCardName}
@@ -202,7 +200,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           </div>
 
           <div style={{ marginBottom: '12px' }}>
-            <label>Size Preset:</label>
+            <label>{t('propertiesPanel.sizePreset')}:</label>
             <select
               value={selectedSizeLabel}
               onChange={(e) => {
@@ -233,7 +231,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
           <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
             <div style={{ flex: 1 }}>
-              <label>Width:</label>
+              <label>{t('propertiesPanel.width')}:</label>
               <input
                 type="number"
                 value={localCardWidth}
@@ -249,7 +247,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               />
             </div>
             <div style={{ flex: 1 }}>
-              <label>Height:</label>
+              <label>{t('propertiesPanel.height')}:</label>
               <input
                 type="number"
                 value={localCardHeight}
@@ -289,7 +287,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
             }}
             disabled={stack.cards.length <= 1}
           >
-            Delete Card
+{t('propertiesPanel.deleteCard')}
           </button>
         </div>
       )}
@@ -297,7 +295,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
       {/* Object Properties Section */}
       {selectedObject ? (
         <div style={{ padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}>
-          <h4>Object Properties ({selectedObject.type})</h4>
+          <h4>{t('propertiesPanel.objectProperties')} ({selectedObject.type})</h4>
           
           {/* Position and Size */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
@@ -345,7 +343,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
           {/* Text Content */}
           <div style={{ marginBottom: '12px' }}>
-            <label>Text:</label>
+            <label>{t('propertiesPanel.textLabel')}:</label>
             <textarea
               value={localText}
               onChange={(e) => {
@@ -358,7 +356,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
           {/* Text Alignment */}
           <div style={{ marginBottom: '12px' }}>
-            <label>Text Align:</label>
+            <label>{t('propertiesPanel.textAlign')}:</label>
             <select
               value={localTextAlign}
               onChange={(e) => {
@@ -368,15 +366,15 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               }}
               style={{ width: '100%', padding: '4px', marginTop: '4px' }}
             >
-              <option value="left">Left</option>
-              <option value="center">Center</option>
-              <option value="right">Right</option>
+              <option value="left">{t('propertiesPanel.alignLeft')}</option>
+              <option value="center">{t('propertiesPanel.alignCenter')}</option>
+              <option value="right">{t('propertiesPanel.alignRight')}</option>
             </select>
           </div>
 
           {/* Colors */}
           <div style={{ marginBottom: '12px' }}>
-            <label>Text Color:</label>
+            <label>{t('propertiesPanel.textColor')}:</label>
             <input
               type="color"
               value={localColor || '#000000'}
@@ -396,7 +394,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                 onChange={handleTransparentToggle}
                 style={{ marginRight: '8px' }}
               />
-              Transparent Background
+              {t('propertiesPanel.transparentBackground')}
             </label>
             {!isTransparentBackground && (
               <input
@@ -410,7 +408,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
           {/* Border */}
           <div style={{ marginBottom: '12px' }}>
-            <label>Border Width:</label>
+            <label>{t('propertiesPanel.borderWidth')}:</label>
             <select
               value={localBorderWidth}
               onChange={(e) => {
@@ -420,15 +418,15 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               }}
               style={{ width: '100%', padding: '4px', marginTop: '4px' }}
             >
-              <option value="none">None</option>
-              <option value="thin">Thin</option>
-              <option value="medium">Medium</option>
-              <option value="thick">Thick</option>
+              <option value="none">{t('propertiesPanel.borderNone')}</option>
+              <option value="thin">{t('propertiesPanel.borderThin')}</option>
+              <option value="medium">{t('propertiesPanel.borderMedium')}</option>
+              <option value="thick">{t('propertiesPanel.borderThick')}</option>
             </select>
           </div>
 
           <div style={{ marginBottom: '12px' }}>
-            <label>Border Color:</label>
+            <label>{t('propertiesPanel.borderColor')}:</label>
             <input
               type="color"
               value={localBorderColor || '#000000'}
@@ -444,7 +442,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           {selectedObject.type === 'image' && (
             <>
               <div style={{ marginBottom: '12px' }}>
-                <label>Image Source:</label>
+                <label>{t('propertiesPanel.imageSource')}:</label>
                 <input
                   type="text"
                   value={localSrc}
@@ -452,12 +450,12 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                     setLocalSrc(e.target.value);
                     handlePropertyChange('src', e.target.value);
                   }}
-                  placeholder="Enter image URL"
+                  placeholder={t('propertiesPanel.imagePlaceholder')}
                   style={{ width: '100%', padding: '4px', marginTop: '4px' }}
                 />
               </div>
               <div style={{ marginBottom: '12px' }}>
-                <label>Object Fit:</label>
+                <label>{t('propertiesPanel.objectFit')}:</label>
                 <select
                   value={localObjectFit}
                   onChange={(e) => {
@@ -467,8 +465,8 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                   }}
                   style={{ width: '100%', padding: '4px', marginTop: '4px' }}
                 >
-                  <option value="contain">Contain</option>
-                  <option value="fill">Fill</option>
+                  <option value="contain">{t('propertiesPanel.objectFitContain')}</option>
+                  <option value="fill">{t('propertiesPanel.objectFitFill')}</option>
                 </select>
               </div>
             </>
@@ -477,14 +475,14 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           {/* Script Section */}
           {isMagicEnabled && (
             <div style={{ marginBottom: '12px' }}>
-              <label>Script:</label>
+              <label>{t('propertiesPanel.scriptLabel')}:</label>
               <textarea
                 value={localScript}
                 onChange={(e) => {
                   setLocalScript(e.target.value);
                   handlePropertyChange('script', e.target.value);
                 }}
-                placeholder="Enter JavaScript code here..."
+                placeholder={t('propertiesPanel.scriptPlaceholder')}
                 style={{ width: '100%', padding: '4px', marginTop: '4px', minHeight: '80px', fontFamily: 'monospace' }}
               />
             </div>
@@ -492,20 +490,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
           {/* Delete Object Button */}
           <button
-            onClick={() => {
-              const objectTypeText = selectedObject.type === 'button' ? 'ボタン' : 
-                                   selectedObject.type === 'text' ? 'テキスト' : 
-                                   selectedObject.type === 'image' ? '画像' : 'オブジェクト';
-              
-              const confirmed = window.confirm(
-                `${objectTypeText}を削除すると取り消しがききません。\n\n` +
-                '本当に削除しますか？'
-              );
-              
-              if (confirmed) {
-                onDeleteObject(selectedObject.id);
-              }
-            }}
+            onClick={() => onDeleteObject(selectedObject.id)}
             style={{
               padding: '8px 16px',
               backgroundColor: '#ff4444',
@@ -515,12 +500,12 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               cursor: 'pointer'
             }}
           >
-            Delete Object
+            {t('propertiesPanel.deleteButton')}
           </button>
         </div>
       ) : (
         <div style={{ padding: '12px', textAlign: 'center', color: '#666' }}>
-          <p>Select an object to edit its properties</p>
+          <p>{t('propertiesPanel.selectObjectMessage')}</p>
         </div>
       )}
       

@@ -114,7 +114,19 @@
       "sizeIPad": "iPad (768×1024)",
       "sizeDesktop": "デスクトップ (1280×720)",
       "exportHTML": "HTML書き出し",
-      "cardSizeChangeWarning": "カードサイズを変更すると、配置されたオブジェクトのレイアウトが崩れるおそれがあります。続行しますか？"
+      "cardSizeChangeWarning": "カードサイズを変更すると、配置されたオブジェクトのレイアウトが崩れるおそれがあります。続行しますか？",
+      "cardProperties": "カードのプロパティ",
+      "cardName": "カード名",
+      "sizePreset": "サイズプリセット",
+      "objectProperties": "オブジェクトのプロパティ",
+      "position": "位置",
+      "size": "サイズ",
+      "imageSource": "画像ソース",
+      "imagePlaceholder": "画像URLを入力",
+      "selectObjectMessage": "オブジェクトを選択してプロパティを編集",
+      "objectFitContain": "収める",
+      "objectFitFill": "埋める",
+      "deleteCard": "カードを削除"
     },
     "settingsModal": {
       "title": "設定",

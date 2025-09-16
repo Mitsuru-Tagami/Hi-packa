@@ -114,7 +114,19 @@
       "sizeIPad": "iPad (768×1024)",
       "sizeDesktop": "Desktop (1280×720)",
       "exportHTML": "Export to HTML",
-      "cardSizeChangeWarning": "Changing the card size may disrupt the layout of placed objects. Do you want to continue?"
+      "cardSizeChangeWarning": "Changing the card size may disrupt the layout of placed objects. Do you want to continue?",
+      "cardProperties": "Card Properties",
+      "cardName": "Card Name",
+      "sizePreset": "Size Preset",
+      "objectProperties": "Object Properties",
+      "position": "Position",
+      "size": "Size",
+      "imageSource": "Image Source",
+      "imagePlaceholder": "Enter image URL",
+      "selectObjectMessage": "Select an object to edit properties",
+      "objectFitContain": "Contain",
+      "objectFitFill": "Fill",
+      "deleteCard": "Delete Card"
     },
     "settingsModal": {
       "title": "Settings",
