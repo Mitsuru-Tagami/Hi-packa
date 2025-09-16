@@ -113,7 +113,8 @@
       "sizeIPhone12Landscape": "iPhone 12/13 Landscape (844×390)",
       "sizeIPad": "iPad (768×1024)",
       "sizeDesktop": "Desktop (1280×720)",
-      "exportHTML": "Export to HTML"
+      "exportHTML": "Export to HTML",
+      "cardSizeChangeWarning": "Changing the card size may disrupt the layout of placed objects. Do you want to continue?"
     },
     "settingsModal": {
       "title": "Settings",

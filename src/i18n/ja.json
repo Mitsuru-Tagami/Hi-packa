@@ -113,7 +113,8 @@
       "sizeIPhone12Landscape": "iPhone 12/13 横向き (844×390)",
       "sizeIPad": "iPad (768×1024)",
       "sizeDesktop": "デスクトップ (1280×720)",
-      "exportHTML": "HTML書き出し"
+      "exportHTML": "HTML書き出し",
+      "cardSizeChangeWarning": "カードサイズを変更すると、配置されたオブジェクトのレイアウトが崩れるおそれがあります。続行しますか？"
     },
     "settingsModal": {
       "title": "設定",

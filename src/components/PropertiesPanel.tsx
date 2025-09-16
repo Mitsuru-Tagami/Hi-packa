@@ -208,11 +208,20 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               onChange={(e) => {
                 const selectedSize = PREDEFINED_CARD_SIZES.find(size => size.label === e.target.value);
                 if (selectedSize && selectedSize.width > 0) {
-                  setLocalCardWidth(selectedSize.width.toString());
-                  setLocalCardHeight(selectedSize.height.toString());
-                  onUpdateCardDimensions(currentCard.id, selectedSize.width, selectedSize.height);
+                  // Show warning dialog before applying changes
+                  const confirmed = window.confirm(t('propertiesPanel.cardSizeChangeWarning'));
+                  if (confirmed) {
+                    setLocalCardWidth(selectedSize.width.toString());
+                    setLocalCardHeight(selectedSize.height.toString());
+                    onUpdateCardDimensions(currentCard.id, selectedSize.width, selectedSize.height);
+                    setSelectedSizeLabel(e.target.value);
+                  } else {
+                    // Reset to current selection if user cancels
+                    return;
+                  }
+                } else {
+                  setSelectedSizeLabel(e.target.value);
                 }
-                setSelectedSizeLabel(e.target.value);
               }}
               style={{ width: '100%', padding: '4px', marginTop: '4px' }}
             >
