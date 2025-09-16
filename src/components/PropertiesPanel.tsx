@@ -172,11 +172,323 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
     }
   };
 
-  // ここにJSXの返り値を追加する必要があります
   return (
-    <div className="properties-panel">
-      {/* プロパティパネルのUIをここに実装 */}
-      <p>Properties Panel - UI implementation needed</p>
+    <div style={{ padding: '16px', height: '100%', overflow: 'auto' }}>
+      <h3>Properties</h3>
+      
+      {/* Card Properties Section */}
+      {currentCard && (
+        <div style={{ marginBottom: '24px', padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}>
+          <h4>Card Properties</h4>
+          
+          <div style={{ marginBottom: '12px' }}>
+            <label>Card Name:</label>
+            <input
+              type="text"
+              value={localCardName}
+              onChange={(e) => setLocalCardName(e.target.value)}
+              onBlur={() => {
+                if (currentCard) {
+                  // onUpdateCardName(currentCard.id, localCardName);
+                }
+              }}
+              style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '12px' }}>
+            <label>Size Preset:</label>
+            <select
+              value={selectedSizeLabel}
+              onChange={(e) => {
+                const selectedSize = PREDEFINED_CARD_SIZES.find(size => size.label === e.target.value);
+                if (selectedSize && selectedSize.width > 0) {
+                  setLocalCardWidth(selectedSize.width.toString());
+                  setLocalCardHeight(selectedSize.height.toString());
+                  onUpdateCardDimensions(currentCard.id, selectedSize.width, selectedSize.height);
+                }
+                setSelectedSizeLabel(e.target.value);
+              }}
+              style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+            >
+              {PREDEFINED_CARD_SIZES.map(size => (
+                <option key={size.label} value={size.label}>{size.label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+            <div style={{ flex: 1 }}>
+              <label>Width:</label>
+              <input
+                type="number"
+                value={localCardWidth}
+                onChange={(e) => setLocalCardWidth(e.target.value)}
+                onBlur={() => {
+                  const width = parseInt(localCardWidth);
+                  const height = parseInt(localCardHeight);
+                  if (!isNaN(width) && !isNaN(height)) {
+                    onUpdateCardDimensions(currentCard.id, width, height);
+                  }
+                }}
+                style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label>Height:</label>
+              <input
+                type="number"
+                value={localCardHeight}
+                onChange={(e) => setLocalCardHeight(e.target.value)}
+                onBlur={() => {
+                  const width = parseInt(localCardWidth);
+                  const height = parseInt(localCardHeight);
+                  if (!isNaN(width) && !isNaN(height)) {
+                    onUpdateCardDimensions(currentCard.id, width, height);
+                  }
+                }}
+                style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={() => {
+              if (stack.cards.length > 1) {
+                onDeleteCard(currentCard.id);
+              }
+            }}
+            disabled={stack.cards.length <= 1}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: stack.cards.length > 1 ? '#ff4444' : '#ccc',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: stack.cards.length > 1 ? 'pointer' : 'not-allowed'
+            }}
+          >
+            Delete Card
+          </button>
+        </div>
+      )}
+
+      {/* Object Properties Section */}
+      {selectedObject ? (
+        <div style={{ padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}>
+          <h4>Object Properties ({selectedObject.type})</h4>
+          
+          {/* Position and Size */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
+            <div>
+              <label>X:</label>
+              <input
+                type="number"
+                value={localX}
+                onChange={(e) => handleNumberInputLocalChange(setLocalX, e)}
+                onBlur={() => handleNumberInputBlur('x', localX)}
+                style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+              />
+            </div>
+            <div>
+              <label>Y:</label>
+              <input
+                type="number"
+                value={localY}
+                onChange={(e) => handleNumberInputLocalChange(setLocalY, e)}
+                onBlur={() => handleNumberInputBlur('y', localY)}
+                style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+              />
+            </div>
+            <div>
+              <label>Width:</label>
+              <input
+                type="number"
+                value={localWidth}
+                onChange={(e) => handleNumberInputLocalChange(setLocalWidth, e)}
+                onBlur={() => handleNumberInputBlur('width', localWidth)}
+                style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+              />
+            </div>
+            <div>
+              <label>Height:</label>
+              <input
+                type="number"
+                value={localHeight}
+                onChange={(e) => handleNumberInputLocalChange(setLocalHeight, e)}
+                onBlur={() => handleNumberInputBlur('height', localHeight)}
+                style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+              />
+            </div>
+          </div>
+
+          {/* Text Content */}
+          <div style={{ marginBottom: '12px' }}>
+            <label>Text:</label>
+            <textarea
+              value={localText}
+              onChange={(e) => {
+                setLocalText(e.target.value);
+                handlePropertyChange('text', e.target.value);
+              }}
+              style={{ width: '100%', padding: '4px', marginTop: '4px', minHeight: '60px' }}
+            />
+          </div>
+
+          {/* Text Alignment */}
+          <div style={{ marginBottom: '12px' }}>
+            <label>Text Align:</label>
+            <select
+              value={localTextAlign}
+              onChange={(e) => {
+                const value = e.target.value as TextAlign;
+                setLocalTextAlign(value);
+                handlePropertyChange('textAlign', value);
+              }}
+              style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+            >
+              <option value="left">Left</option>
+              <option value="center">Center</option>
+              <option value="right">Right</option>
+            </select>
+          </div>
+
+          {/* Colors */}
+          <div style={{ marginBottom: '12px' }}>
+            <label>Text Color:</label>
+            <input
+              type="color"
+              value={localColor || '#000000'}
+              onChange={(e) => {
+                setLocalColor(e.target.value);
+                handlePropertyChange('color', e.target.value);
+              }}
+              style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '12px' }}>
+            <label>
+              <input
+                type="checkbox"
+                checked={isTransparentBackground}
+                onChange={handleTransparentToggle}
+                style={{ marginRight: '8px' }}
+              />
+              Transparent Background
+            </label>
+            {!isTransparentBackground && (
+              <input
+                type="color"
+                value={localBackgroundColor || '#ffffff'}
+                onChange={handleBackgroundColorChange}
+                style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+              />
+            )}
+          </div>
+
+          {/* Border */}
+          <div style={{ marginBottom: '12px' }}>
+            <label>Border Width:</label>
+            <select
+              value={localBorderWidth}
+              onChange={(e) => {
+                const value = e.target.value as BorderWidth;
+                setLocalBorderWidth(value);
+                handlePropertyChange('borderWidth', value);
+              }}
+              style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+            >
+              <option value="none">None</option>
+              <option value="thin">Thin</option>
+              <option value="medium">Medium</option>
+              <option value="thick">Thick</option>
+            </select>
+          </div>
+
+          <div style={{ marginBottom: '12px' }}>
+            <label>Border Color:</label>
+            <input
+              type="color"
+              value={localBorderColor || '#000000'}
+              onChange={(e) => {
+                setLocalBorderColor(e.target.value);
+                handlePropertyChange('borderColor', e.target.value);
+              }}
+              style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+            />
+          </div>
+
+          {/* Image specific properties */}
+          {selectedObject.type === 'image' && (
+            <>
+              <div style={{ marginBottom: '12px' }}>
+                <label>Image Source:</label>
+                <input
+                  type="text"
+                  value={localSrc}
+                  onChange={(e) => {
+                    setLocalSrc(e.target.value);
+                    handlePropertyChange('src', e.target.value);
+                  }}
+                  placeholder="Enter image URL"
+                  style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+                />
+              </div>
+              <div style={{ marginBottom: '12px' }}>
+                <label>Object Fit:</label>
+                <select
+                  value={localObjectFit}
+                  onChange={(e) => {
+                    const value = e.target.value as 'contain' | 'fill';
+                    setLocalObjectFit(value);
+                    handlePropertyChange('objectFit', value);
+                  }}
+                  style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+                >
+                  <option value="contain">Contain</option>
+                  <option value="fill">Fill</option>
+                </select>
+              </div>
+            </>
+          )}
+
+          {/* Script Section */}
+          {isMagicEnabled && (
+            <div style={{ marginBottom: '12px' }}>
+              <label>Script:</label>
+              <textarea
+                value={localScript}
+                onChange={(e) => {
+                  setLocalScript(e.target.value);
+                  handlePropertyChange('script', e.target.value);
+                }}
+                placeholder="Enter JavaScript code here..."
+                style={{ width: '100%', padding: '4px', marginTop: '4px', minHeight: '80px', fontFamily: 'monospace' }}
+              />
+            </div>
+          )}
+
+          {/* Delete Object Button */}
+          <button
+            onClick={() => onDeleteObject(selectedObject.id)}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#ff4444',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Delete Object
+          </button>
+        </div>
+      ) : (
+        <div style={{ padding: '12px', textAlign: 'center', color: '#666' }}>
+          <p>Select an object to edit its properties</p>
+        </div>
+      )}
     </div>
   );
 };
