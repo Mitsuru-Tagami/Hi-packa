@@ -153,6 +153,8 @@ export const StackObjectNode: React.FC<StackObjectNodeProps> = ({
       if (object.type === 'button') {
         if (object.action === 'jumpToCard' && object.jumpToCardId) {
           onSwitchCard(object.jumpToCardId);
+        } else if (object.action === 'jumpToCardAnchor' && object.jumpToCardId) {
+          onSwitchCard(object.jumpToCardId);
         } else if (object.action === 'openUrl' && object.src) {
           onOpenUrl(object.src);
         } else if (object.script) {
