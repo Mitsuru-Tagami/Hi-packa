@@ -73,8 +73,8 @@ export const StackObjectNode: React.FC<StackObjectNodeProps> = ({
   onOpenUrl, 
   executeScript 
 }) => {
-  const shapeRef = useRef<any>();
-  const trRef = useRef<any>();
+  const shapeRef = useRef<any>(null);
+  const trRef = useRef<any>(null);
   const [img, setImg] = useState<HTMLImageElement | undefined>(undefined);
 
   // Image loading effect with cleanup
@@ -128,7 +128,7 @@ export const StackObjectNode: React.FC<StackObjectNodeProps> = ({
     });
   }, [object, onUpdateObject]);
 
-  const handleTransformEnd = useCallback((e: any) => {
+  const handleTransformEnd = useCallback((_e: any) => {
     const node = shapeRef.current;
     if (!node) return;
 
@@ -176,7 +176,7 @@ export const StackObjectNode: React.FC<StackObjectNodeProps> = ({
   ]);
 
   // Destructure with proper typing
-  const { x, y, width, height, type, text } = object;
+  const { x, y, width, height, text } = object;
 
   // Style calculations
   const currentStrokeColor = object.borderColor || '#000000';

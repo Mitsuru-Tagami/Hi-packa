@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Layout from './components/Layout';
 import { initialStack } from './initialData';
 import type { Stack, StackObject, ObjectType } from './types';

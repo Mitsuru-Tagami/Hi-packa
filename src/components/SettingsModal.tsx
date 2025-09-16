@@ -15,8 +15,6 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -41,8 +39,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
   onSetMagicEnabled,
-  isMagicEnabled = false, // デフォルト値を設定
+  isMagicEnabled = false
 }) => {
+  // Use isMagicEnabled to show current state
+  console.log('Current magic state:', isMagicEnabled);
   const [magicInput, setMagicInput] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
