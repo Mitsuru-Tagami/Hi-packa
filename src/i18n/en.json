@@ -126,7 +126,17 @@
       "selectObjectMessage": "Select an object to edit properties",
       "objectFitContain": "Contain",
       "objectFitFill": "Fill",
-      "deleteCard": "Delete Card"
+      "deleteCard": "Delete Card",
+      "buttonAction": "Button Action",
+      "actionNone": "None",
+      "actionJumpToCard": "Jump to Card (JavaScript)",
+      "actionJumpToCardAnchor": "Jump to Card (Anchor)",
+      "actionOpenUrl": "Open URL",
+      "actionScript": "Execute Script",
+      "targetCard": "Target Card",
+      "selectCard": "Select Card",
+      "url": "URL",
+      "urlPlaceholder": "Enter URL"
     },
     "settingsModal": {
       "title": "Settings",

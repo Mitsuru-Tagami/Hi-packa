@@ -126,7 +126,17 @@
       "selectObjectMessage": "オブジェクトを選択してプロパティを編集",
       "objectFitContain": "収める",
       "objectFitFill": "埋める",
-      "deleteCard": "カードを削除"
+      "deleteCard": "カードを削除",
+      "buttonAction": "ボタンアクション",
+      "actionNone": "なし",
+      "actionJumpToCard": "カードに移動（JavaScript）",
+      "actionJumpToCardAnchor": "カードに移動（アンカー）",
+      "actionOpenUrl": "URLを開く",
+      "actionScript": "スクリプト実行",
+      "targetCard": "移動先カード",
+      "selectCard": "カードを選択",
+      "url": "URL",
+      "urlPlaceholder": "URLを入力"
     },
     "settingsModal": {
       "title": "設定",

@@ -438,6 +438,66 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
             />
           </div>
 
+          {/* Button specific properties */}
+          {selectedObject.type === 'button' && (
+            <>
+              <div style={{ marginBottom: '12px' }}>
+                <label>{t('propertiesPanel.buttonAction')}:</label>
+                <select
+                  value={selectedObject.action || 'none'}
+                  onChange={(e) => {
+                    const value = e.target.value as 'none' | 'jumpToCard' | 'jumpToCardAnchor' | 'openUrl' | 'script';
+                    handlePropertyChange('action', value);
+                    if (value === 'none') {
+                      handlePropertyChange('jumpToCardId', null);
+                      handlePropertyChange('src', '');
+                    }
+                  }}
+                  style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+                >
+                  <option value="none">{t('propertiesPanel.actionNone')}</option>
+                  <option value="jumpToCard">{t('propertiesPanel.actionJumpToCard')}</option>
+                  <option value="jumpToCardAnchor">{t('propertiesPanel.actionJumpToCardAnchor')}</option>
+                  <option value="openUrl">{t('propertiesPanel.actionOpenUrl')}</option>
+                  {isMagicEnabled && <option value="script">{t('propertiesPanel.actionScript')}</option>}
+                </select>
+              </div>
+
+              {(selectedObject.action === 'jumpToCard' || selectedObject.action === 'jumpToCardAnchor') && (
+                <div style={{ marginBottom: '12px' }}>
+                  <label>{t('propertiesPanel.targetCard')}:</label>
+                  <select
+                    value={selectedObject.jumpToCardId || ''}
+                    onChange={(e) => {
+                      handlePropertyChange('jumpToCardId', e.target.value || null);
+                    }}
+                    style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+                  >
+                    <option value="">{t('propertiesPanel.selectCard')}</option>
+                    {stack.cards.map(card => (
+                      <option key={card.id} value={card.id}>{card.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {selectedObject.action === 'openUrl' && (
+                <div style={{ marginBottom: '12px' }}>
+                  <label>{t('propertiesPanel.url')}:</label>
+                  <input
+                    type="text"
+                    value={selectedObject.src || ''}
+                    onChange={(e) => {
+                      handlePropertyChange('src', e.target.value);
+                    }}
+                    placeholder={t('propertiesPanel.urlPlaceholder')}
+                    style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+                  />
+                </div>
+              )}
+            </>
+          )}
+
           {/* Image specific properties */}
           {selectedObject.type === 'image' && (
             <>

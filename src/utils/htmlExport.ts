@@ -66,9 +66,14 @@ const generateObjectHTML = (obj: StackObject): string => {
       content = obj.text || 'Button';
       if (obj.action === 'jumpToCard' && obj.jumpToCardId) {
         attributes += ` onclick="switchToCard('${obj.jumpToCardId}')"`;
+      } else if (obj.action === 'jumpToCardAnchor' && obj.jumpToCardId) {
+        attributes = attributes.replace('button', 'a');
+        attributes += ` href="#card_${obj.jumpToCardId}"`;
+        tag = 'a';
       } else if (obj.action === 'openUrl' && obj.src) {
         attributes += ` onclick="window.open('${obj.src}', '_blank')"`;
       } else if (obj.script) {
+        // Use executeScript function to provide helper functions
         const escapedScript = obj.script.replace(/'/g, "\\'").replace(/\n/g, '\\n');
         attributes += ` onclick="executeScript('${escapedScript}')"`;
       }
@@ -109,7 +114,7 @@ const generateCardHTML = (card: any, objects: StackObject[]): string => {
   ].join('; ');
 
   return `
-  <div id="card_${card.id}" class="card" style="${cardStyles}; display: none;">
+  <div id="card_${card.id}" class="card" style="${cardStyles}; position: absolute; top: 0; left: 0;">
     ${objectsHTML}
   </div>`;
 };
@@ -131,11 +136,6 @@ export const exportToHTML = async (stack: Stack): Promise<string> => {
     const cardObjects = card.objects || [];
     return generateCardHTML(card, cardObjects);
   }).join('\n');
-
-  // Generate cards list for navigation
-  const cardsList = stack.cards.map(card => 
-    `    <button onclick="switchToCard('${card.id}')">${card.name}</button>`
-  ).join('\n');
 
   const currentCardId = stack.currentCardId || (stack.cards.length > 0 ? stack.cards[0].id : '');
 
@@ -163,38 +163,41 @@ export const exportToHTML = async (stack: Stack): Promise<string> => {
       margin-bottom: 20px;
     }
     
-    .navigation {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    
-    .navigation button {
-      margin: 0 5px;
-      padding: 8px 16px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    
-    .navigation button:hover {
-      background: #0056b3;
-    }
-    
-    .navigation button.active {
-      background: #28a745;
-    }
     
     .card-container {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
+      position: relative;
+      width: fit-content;
+      margin: 0 auto 20px auto;
     }
     
     .card {
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       border-radius: 8px;
+    }
+    
+    .card:target {
+      display: block !important;
+    }
+    
+    .card:not(:target) {
+      display: none;
+    }
+    
+    .security-warning {
+      background-color: #d1edff;
+      border: 1px solid #0084ff;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      color: #0056b3;
+    }
+    
+    .security-warning p {
+      margin: 8px 0;
+    }
+    
+    .security-warning strong {
+      color: #0056b3;
     }
     
     .footer {
@@ -211,8 +214,10 @@ export const exportToHTML = async (stack: Stack): Promise<string> => {
       <h1>Hi-packa Export</h1>
     </div>
     
-    <div class="navigation">
-${cardsList}
+    <div class="security-warning">
+      <p><strong>✅ ローカル動作対応済み</strong></p>
+      <p>このHTMLファイルはローカルで開いても正常に動作するよう最適化されています。</p>
+      <p>じゃんけんゲームなどのJavaScript機能もそのまま楽しめます！</p>
     </div>
     
     <div class="card-container">
@@ -227,7 +232,8 @@ ${cardsHTML}
   <script>
     let currentCardId = '${currentCardId}';
     
-    function switchToCard(cardId) {
+    // Card switching function - works locally
+    function switchCard(cardId) {
       // Hide all cards
       const cards = document.querySelectorAll('.card');
       cards.forEach(card => card.style.display = 'none');
@@ -237,34 +243,40 @@ ${cardsHTML}
       if (targetCard) {
         targetCard.style.display = 'block';
         currentCardId = cardId;
-        
-        // Update navigation buttons
-        const buttons = document.querySelectorAll('.navigation button');
-        buttons.forEach(btn => btn.classList.remove('active'));
-        
-        const activeButton = Array.from(buttons).find(btn => 
-          btn.onclick.toString().includes(cardId)
-        );
-        if (activeButton) {
-          activeButton.classList.add('active');
-        }
       }
     }
     
+    // Legacy function name for compatibility
+    function switchToCard(cardId) {
+      switchCard(cardId);
+    }
+    
+    // Update object text - works locally
+    function updateObjectText(objectId, newText) {
+      const element = document.getElementById(objectId);
+      if (element) {
+        element.textContent = newText;
+      }
+    }
+    
+    // Execute inline script - works locally
     function executeScript(script) {
       try {
-        // Create a safe execution context
-        const func = new Function('switchToCard', script);
-        func(switchToCard);
+        // Create execution context with helper functions
+        const func = new Function('switchCard', 'switchToCard', 'updateObjectText', script);
+        func(switchCard, switchToCard, updateObjectText);
       } catch (error) {
         console.error('Script execution error:', error);
         alert('Script execution error: ' + error.message);
       }
     }
     
-    // Initialize - show first card
+    // Show current card on load
     if (currentCardId) {
-      switchToCard(currentCardId);
+      const currentCard = document.getElementById('card_' + currentCardId);
+      if (currentCard) {
+        currentCard.style.display = 'block';
+      }
     }
   </script>
 </body>

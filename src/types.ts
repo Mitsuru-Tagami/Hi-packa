@@ -1,7 +1,7 @@
 export type ObjectType = 'button' | 'text' | 'image';
 export type TextAlign = 'left' | 'center' | 'right';
 export type BorderWidth = 'none' | 'thin' | 'medium' | 'thick';
-export type ButtonAction = 'none' | 'jumpToCard' | 'openUrl' | 'script';
+export type ButtonAction = 'none' | 'jumpToCard' | 'jumpToCardAnchor' | 'openUrl' | 'script';
 
 export type StackObject = {
   id: string;
