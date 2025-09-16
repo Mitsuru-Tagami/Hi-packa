@@ -109,20 +109,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           </Select>
         </FormControl>
 
-        {/* Allow Scripting on All Objects Toggle - 修正版 */}
-        <FormControlLabel
-          sx={{ mt: 2, display: 'block' }}
-          control={
-            <Switch
-              disabled={!isMagicEnabled}
-            />
-          }
-          label={
-            <Typography sx={{ color: 'rgba(0, 0, 0, 0.87)' }}>
-              {t('settingsModal.allowScriptingOnAllObjects')}
-            </Typography>
-          }
-        />
 
         <Typography id="settings-modal-description" sx={{ mt: 2 }}>
           {t('settingsModal.magicWordPrompt')}
