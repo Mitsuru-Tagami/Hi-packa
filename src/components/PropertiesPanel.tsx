@@ -255,7 +255,14 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           <button
             onClick={() => {
               if (stack.cards.length > 1) {
-                onDeleteCard(currentCard.id);
+                const confirmed = window.confirm(
+                  'カードを削除すると取り消しがききません。\n' +
+                  'このカード内のすべてのオブジェクト（ボタン、テキスト、画像）も一緒に削除されます。\n\n' +
+                  '本当に削除しますか？'
+                );
+                if (confirmed) {
+                  onDeleteCard(currentCard.id);
+                }
               }
             }}
             disabled={stack.cards.length <= 1}
@@ -471,7 +478,20 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
           {/* Delete Object Button */}
           <button
-            onClick={() => onDeleteObject(selectedObject.id)}
+            onClick={() => {
+              const objectTypeText = selectedObject.type === 'button' ? 'ボタン' : 
+                                   selectedObject.type === 'text' ? 'テキスト' : 
+                                   selectedObject.type === 'image' ? '画像' : 'オブジェクト';
+              
+              const confirmed = window.confirm(
+                `${objectTypeText}を削除すると取り消しがききません。\n\n` +
+                '本当に削除しますか？'
+              );
+              
+              if (confirmed) {
+                onDeleteObject(selectedObject.id);
+              }
+            }}
             style={{
               padding: '8px 16px',
               backgroundColor: '#ff4444',
