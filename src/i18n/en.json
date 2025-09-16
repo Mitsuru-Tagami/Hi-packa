@@ -107,12 +107,13 @@
       "sizeCustom": "Custom",
       "customWidth": "Custom Width",
       "customHeight": "Custom Height",
-      "sizeIPhone8Plus": "iPhone 8 Plus (414x736)",
-      "sizeIPhone8PlusLandscape": "iPhone 8 Plus Landscape (736x414)",
-      "sizeIPhone12": "iPhone 12/13 (390x844)",
-      "sizeIPhone12Landscape": "iPhone 12/13 Landscape (844x390)",
-      "sizeIPad": "iPad (768x1024)",
-      "sizeDesktop": "Desktop (1280x720)"
+      "sizeIPhone8Plus": "iPhone 8 Plus (414×736)",
+      "sizeIPhone8PlusLandscape": "iPhone 8 Plus Landscape (736×414)",
+      "sizeIPhone12": "iPhone 12/13 (390×844)",
+      "sizeIPhone12Landscape": "iPhone 12/13 Landscape (844×390)",
+      "sizeIPad": "iPad (768×1024)",
+      "sizeDesktop": "Desktop (1280×720)",
+      "exportHTML": "Export to HTML"
     },
     "settingsModal": {
       "title": "Settings",

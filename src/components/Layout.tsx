@@ -27,6 +27,7 @@ interface LayoutProps {
   onAddCard: () => void;
   onUpdateCardName: (cardId: string, newName: string) => void;
   onDeleteCard: (cardId: string) => void;
+  onExportHTML: () => void;
 }
 
 const Layout: React.FC<LayoutProps> = ({
@@ -50,6 +51,7 @@ const Layout: React.FC<LayoutProps> = ({
   onAddCard,
   onUpdateCardName,
   onDeleteCard,
+  onExportHTML,
 }) => {
   const currentCard = stack.cards.find(card => card.id === stack.currentCardId);
 
@@ -78,6 +80,7 @@ const Layout: React.FC<LayoutProps> = ({
             onToggleRunMode={onToggleRunMode}
             onOpenSettingsModal={onOpenSettingsModal}
             onAddCard={onAddCard}
+            onExportHTML={onExportHTML}
           />
         </Box>
 

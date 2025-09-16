@@ -1,7 +1,7 @@
 export type ObjectType = 'button' | 'text' | 'image';
 export type TextAlign = 'left' | 'center' | 'right';
 export type BorderWidth = 'none' | 'thin' | 'medium' | 'thick';
-export type ButtonAction = 'none' | 'jumpToCard';
+export type ButtonAction = 'none' | 'jumpToCard' | 'openUrl' | 'script';
 
 export type StackObject = {
   id: string;
@@ -18,6 +18,7 @@ export type StackObject = {
   jumpToCardId?: string | null;
   src?: string;
   objectFit?: 'contain' | 'fill';
+  alt?: string; // Alt text for images
   // New text formatting properties
   fontSize?: string;
   fontWeight?: 'normal' | 'bold';

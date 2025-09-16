@@ -3,6 +3,7 @@ import Layout from './components/Layout';
 import { initialStack } from './initialData';
 import type { Stack, StackObject, ObjectType } from './types';
 import { t } from './i18n';
+import { exportToHTML, downloadHTML } from './utils/htmlExport';
 
 function App() {
   const [stack, setStack] = useState<Stack>(initialStack);
@@ -238,6 +239,16 @@ function App() {
     }));
   };
 
+  const handleExportHTML = async () => {
+    try {
+      const htmlContent = await exportToHTML(stack);
+      downloadHTML(htmlContent, 'hi-packa-export.html');
+    } catch (error) {
+      console.error('Failed to export HTML:', error);
+      alert('Failed to export HTML. Please try again.');
+    }
+  };
+
   return (
     <Layout
       stack={stack}
@@ -256,10 +267,11 @@ function App() {
       onSetMagicEnabled={setIsMagicEnabled}
       onAddObject={handleAddObject}
       onDeleteObject={handleDeleteObject}
-      onDeleteCard={handleDeleteCard} // New prop
+      onDeleteCard={handleDeleteCard}
       onUpdateCardDimensions={handleUpdateCardDimensions}
-      onAddCard={handleAddCard} // New prop
-      onUpdateCardName={handleUpdateCardName} // New prop
+      onAddCard={handleAddCard}
+      onUpdateCardName={handleUpdateCardName}
+      onExportHTML={handleExportHTML}
     />
   );
 }

@@ -13,8 +13,9 @@ interface CardListPanelProps {
   onSwitchCard: (cardId: string) => void;
   isRunMode: boolean;
   onToggleRunMode: () => void;
-  onOpenSettingsModal: () => void; // New prop
-  onAddCard: () => void; // New prop
+  onOpenSettingsModal: () => void;
+  onAddCard: () => void;
+  onExportHTML: () => void;
 }
 
 const CardListPanel: React.FC<CardListPanelProps> = ({
@@ -23,7 +24,8 @@ const CardListPanel: React.FC<CardListPanelProps> = ({
   isRunMode,
   onToggleRunMode,
   onOpenSettingsModal,
-  onAddCard, // Destructure new prop
+  onAddCard,
+  onExportHTML,
 }) => {
   return (
     <Box sx={{ borderRight: '1px solid #ddd', height: '100vh', p: 2 }}>
@@ -42,6 +44,31 @@ const CardListPanel: React.FC<CardListPanelProps> = ({
           </ListItemButton>
         ))}
       </List>
+      
+      {/* Add Card Button - moved here from properties panel */}
+      <Box sx={{ mt: 2 }}>
+        <Button
+          variant="contained"
+          onClick={onAddCard}
+          fullWidth
+          color="primary"
+        >
+          {t('addCardButton')}
+        </Button>
+      </Box>
+      
+      {/* Export HTML Button - moved here from properties panel */}
+      <Box sx={{ mt: 1 }}>
+        <Button
+          variant="contained"
+          onClick={onExportHTML}
+          fullWidth
+          color="success"
+        >
+          {t('exportHTML')}
+        </Button>
+      </Box>
+      
       <Box sx={{ mt: 3 }}>
         <Typography variant="h6" gutterBottom>
           {t('mode')}
@@ -54,25 +81,15 @@ const CardListPanel: React.FC<CardListPanelProps> = ({
           {isRunMode ? t('editMode') : t('runMode')}
         </Button>
       </Box>
-      <Box sx={{ mt: 2 }}> {/* Added margin top for spacing */}
+      <Box sx={{ mt: 2 }}>
         <Button
-          variant="outlined" // Changed to outlined for distinction
+          variant="outlined"
           onClick={onOpenSettingsModal}
           fullWidth
         >
           {t('settings')}
         </Button>
       </Box>
-      <Box sx={{ mt: 1 }}> {/* Added margin top for spacing */}
-        <Button
-          variant="contained" // Use contained for primary action
-          onClick={onAddCard}
-          fullWidth
-        >
-          {t('addCardButton')}
-        </Button>
-      </Box>
-      {/* Add other controls like "Export HTML" here later */}
     </Box>
   );
 };
