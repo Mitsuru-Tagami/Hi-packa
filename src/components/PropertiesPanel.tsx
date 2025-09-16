@@ -12,6 +12,7 @@ interface PropertiesPanelProps {
   currentCard: Card | null;
   onDeleteCard: (cardId: string) => void;
   stack: Stack;
+  onUpdateCardName: (cardId: string, newName: string) => void;
 }
 
 // ユーティリティ関数を追加
@@ -39,7 +40,8 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   onUpdateCardDimensions, 
   currentCard, 
   onDeleteCard, 
-  stack 
+  stack,
+  onUpdateCardName
 }) => {
   // Object関連のローカルステート
   const [localX, setLocalX] = useState<string>('');
@@ -192,7 +194,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               onChange={(e) => setLocalCardName(e.target.value)}
               onBlur={() => {
                 if (currentCard) {
-                  // onUpdateCardName(currentCard.id, localCardName);
+                  onUpdateCardName(currentCard.id, localCardName);
                 }
               }}
               style={{ width: '100%', padding: '4px', marginTop: '4px' }}

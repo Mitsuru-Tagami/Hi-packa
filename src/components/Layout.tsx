@@ -1,6 +1,5 @@
 import React from 'react';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import CardListPanel from './CardListPanel';
 import CardCanvas from './CardCanvas';
 import { PropertiesPanel } from './PropertiesPanel';
@@ -25,7 +24,6 @@ interface LayoutProps {
   onAddObject: (type: ObjectType, x: number, y: number) => void;
   onDeleteObject: (objectId: string) => void;
   onUpdateCardDimensions: (cardId: string, width: number, height: number) => void;
-  onSetAllowScriptingOnAllObjects: (enabled: boolean) => void;
   onAddCard: () => void;
   onUpdateCardName: (cardId: string, newName: string) => void;
   onDeleteCard: (cardId: string) => void;
@@ -49,7 +47,6 @@ const Layout: React.FC<LayoutProps> = ({
   onAddObject,
   onDeleteObject,
   onUpdateCardDimensions,
-  onSetAllowScriptingOnAllObjects, // この未使用propsを追加
   onAddCard,
   onUpdateCardName,
   onDeleteCard,
@@ -81,8 +78,6 @@ const Layout: React.FC<LayoutProps> = ({
             onToggleRunMode={onToggleRunMode}
             onOpenSettingsModal={onOpenSettingsModal}
             onAddCard={onAddCard}
-            onUpdateCardName={onUpdateCardName} // 追加された未使用props
-            onDeleteCard={onDeleteCard} // 追加された未使用props
           />
         </Box>
 
@@ -127,6 +122,7 @@ const Layout: React.FC<LayoutProps> = ({
             onUpdateCardDimensions={onUpdateCardDimensions}
             currentCard={currentCard}
             onDeleteCard={onDeleteCard}
+            onUpdateCardName={onUpdateCardName}
           />
         </Box>
       </Box>
