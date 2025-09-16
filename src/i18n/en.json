@@ -106,7 +106,13 @@
       "cardSize": "Card Size",
       "sizeCustom": "Custom",
       "customWidth": "Custom Width",
-      "customHeight": "Custom Height"
+      "customHeight": "Custom Height",
+      "sizeIPhone8Plus": "iPhone 8 Plus (414x736)",
+      "sizeIPhone8PlusLandscape": "iPhone 8 Plus Landscape (736x414)",
+      "sizeIPhone12": "iPhone 12/13 (390x844)",
+      "sizeIPhone12Landscape": "iPhone 12/13 Landscape (844x390)",
+      "sizeIPad": "iPad (768x1024)",
+      "sizeDesktop": "Desktop (1280x720)"
     },
     "settingsModal": {
       "title": "Settings",

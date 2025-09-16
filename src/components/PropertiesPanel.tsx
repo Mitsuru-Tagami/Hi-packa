@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { StackObject, BorderWidth, TextAlign, Card, Stack } from '../types';
+import { t } from '../i18n';
 
 interface PropertiesPanelProps {
   selectedObject: StackObject | null;
@@ -20,11 +21,13 @@ const parseUnitValue = (value: string): number => {
 };
 
 const PREDEFINED_CARD_SIZES = [
-  { label: 'iPhone 8 Plus (414x736)', width: 414, height: 736 },
-  { label: 'iPhone 12/13 (390x844)', width: 390, height: 844 },
-  { label: 'iPad (768x1024)', width: 768, height: 1024 },
-  { label: 'Desktop (1280x720)', width: 1280, height: 720 },
-  { label: 'Custom', width: 0, height: 0 },
+  { label: 'sizeIPhone8Plus', width: 414, height: 736 },
+  { label: 'sizeIPhone8PlusLandscape', width: 736, height: 414 },
+  { label: 'sizeIPhone12', width: 390, height: 844 },
+  { label: 'sizeIPhone12Landscape', width: 844, height: 390 },
+  { label: 'sizeIPad', width: 768, height: 1024 },
+  { label: 'sizeDesktop', width: 1280, height: 720 },
+  { label: 'sizeCustom', width: 0, height: 0 },
 ];
 
 export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ 
@@ -212,7 +215,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               style={{ width: '100%', padding: '4px', marginTop: '4px' }}
             >
               {PREDEFINED_CARD_SIZES.map(size => (
-                <option key={size.label} value={size.label}>{size.label}</option>
+                <option key={size.label} value={size.label}>{t(`propertiesPanel.${size.label}`)}</option>
               ))}
             </select>
           </div>
