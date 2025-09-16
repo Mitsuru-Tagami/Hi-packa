@@ -215,11 +215,17 @@ function App() {
   const handleAddCard = () => {
     setStack(prevStack => {
       const newCardId = `card-${Date.now()}`;
+      
+      // Get the current card to inherit its dimensions
+      const currentCard = prevStack.cards.find(card => card.id === prevStack.currentCardId);
+      const inheritedWidth = currentCard ? currentCard.width : 414;
+      const inheritedHeight = currentCard ? currentCard.height : 736;
+      
       const newCard = {
         id: newCardId,
         name: t('newCardName', { number: prevStack.cards.length + 1 }), // Use translation for new card name
-        width: 414, // Default width
-        height: 736, // Default height
+        width: inheritedWidth, // Inherit width from current card
+        height: inheritedHeight, // Inherit height from current card
         objects: [],
       };
       return {
