@@ -1,9 +1,9 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import CardListPanel from './CardListPanel';
-import CardCanvas from './CardCanvas';
+import CardCanvas from '././CardCanvas';
 import { PropertiesPanel } from './PropertiesPanel';
-import SettingsModal from './SettingsModal';
+import { SettingsModalComponent as SettingsModal } from './SettingsModal'; // Corrected import
 import type { Stack, StackObject, ObjectType, Card } from '../types';
 
 interface LayoutProps {
@@ -108,13 +108,13 @@ const Layout: React.FC<LayoutProps> = ({
           onDeleteCard={onDeleteCard}
           onUpdateCardDimensions={onUpdateCardDimensions}
           onUpdateCardName={onUpdateCardName}
-          onDeleteObject={onDeleteObject} // This was missing from PropertiesPanelProps
+          onDeleteObject={onDeleteObject}
         />
       </Box>
 
       <SettingsModal
         isOpen={isSettingsModalOpen}
-        onClose={closeSettingsModal}
+        onClose={onCloseSettingsModal}
         onSetMagicEnabled={onSetMagicEnabled}
         isMagicEnabled={isMagicEnabled}
       />
