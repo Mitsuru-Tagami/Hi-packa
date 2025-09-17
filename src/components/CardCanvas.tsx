@@ -5,6 +5,8 @@ import { StackObjectNode } from './StackObjectNode';
 import Menu from '@mui/material/Menu'; // Import Menu
 import MenuItem from '@mui/material/MenuItem'; // Import MenuItem
 import { t } from '../i18n';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 
 interface CardCanvasProps {
   stack: Stack;
@@ -124,7 +126,7 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   }
   return (
     <React.Fragment>
-      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
         <Stage
           width={window.innerWidth * 0.6}
           height={window.innerHeight}
@@ -166,11 +168,11 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
           </Layer>
         </Stage>
         {/* 拡大縮小ボタンUI */}
-        <div style={{ position: 'absolute', right: 24, bottom: 24, display: 'flex', flexDirection: 'column', gap: 8, zIndex: 10 }}>
-          <button style={{ fontSize: '1.5rem', width: 40, height: 40 }} onClick={() => setStageScale(s => Math.min(s * 1.2, 5))}>＋</button>
-          <button style={{ fontSize: '1.5rem', width: 40, height: 40 }} onClick={() => setStageScale(s => Math.max(s / 1.2, 0.2))}>－</button>
-        </div>
-      </div>
+        <Box sx={{ position: 'absolute', right: 24, bottom: 24, display: 'flex', flexDirection: 'column', gap: 1, zIndex: 10 }}>
+          <Button variant="contained" onClick={() => setStageScale(s => Math.min(s * 1.2, 5))} sx={{ minWidth: 40, height: 40, fontSize: '1.5rem' }}>＋</Button>
+          <Button variant="contained" onClick={() => setStageScale(s => Math.max(s / 1.2, 0.2))} sx={{ minWidth: 40, height: 40, fontSize: '1.5rem' }}>－</Button>
+        </Box>
+      </Box>
       {/* Material-UI Context Menu */}
       <Menu
         open={Boolean(anchorEl)} // Open if anchorEl is not null
