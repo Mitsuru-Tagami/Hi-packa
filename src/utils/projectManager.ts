@@ -1,4 +1,4 @@
-import type { Stack } from '../types';
+import type { Stack, StackObject, ObjectType, TextAlign, BorderWidth, ButtonAction } from '../types';
 
 // プロジェクトファイルの形式
 interface ProjectFile {
@@ -6,6 +6,56 @@ interface ProjectFile {
   timestamp: string;
   stack: Stack;
 }
+
+// Helper function to apply defaults to a StackObject
+const applyObjectDefaults = (obj: any): StackObject => {
+  const defaultTextProps = {
+    fontSize: obj.fontSize || '16px',
+    fontWeight: obj.fontWeight || 'normal',
+    fontStyle: obj.fontStyle || 'normal',
+    textDecoration: obj.textDecoration || 'none',
+    fontFamily: obj.fontFamily || 'sans-serif',
+  };
+
+  const defaultImageProps = {
+    src: obj.src || 'https://via.placeholder.com/150',
+    width: obj.width || 150,
+    height: obj.height || 150,
+    objectFit: obj.objectFit || 'contain',
+  };
+
+  const defaultButtonProps = {
+    action: obj.action || 'none',
+    jumpToCardId: obj.jumpToCardId || null,
+  };
+
+  let defaults = {};
+  if (obj.type === 'text') {
+    defaults = { ...defaultTextProps };
+  } else if (obj.type === 'image') {
+    defaults = { ...defaultImageProps };
+  } else if (obj.type === 'button') {
+    defaults = { ...defaultButtonProps };
+  }
+
+  return {
+    id: obj.id || `obj-${Date.now()}`,
+    type: obj.type,
+    x: obj.x || 0,
+    y: obj.y || 0,
+    width: obj.width || 100,
+    height: obj.height || 50,
+    text: obj.text || '', // Required
+    textAlign: obj.textAlign || 'left', // Required
+    borderWidth: obj.borderWidth || 'none', // Required
+    script: obj.script || '', // Required
+    color: obj.color || '#000000', // Default text/button color
+    backgroundColor: obj.backgroundColor || 'transparent', // Default background
+    borderColor: obj.borderColor || '#000000', // Default border color
+    ...defaults, // Type-specific defaults
+    ...obj, // Override with actual object properties
+  } as StackObject; // Cast to StackObject
+};
 
 // プロジェクトをJSONファイルとして保存
 export const saveProject = (stack: Stack, filename?: string): void => {
@@ -50,7 +100,16 @@ export const loadProject = (file: File): Promise<Stack> => {
           throw new Error('Invalid project file: missing stack data');
         }
         
-        resolve(projectData.stack);
+        // Apply defaults to all objects in the stack
+        const processedStack: Stack = {
+          ...projectData.stack,
+          cards: projectData.stack.cards.map(card => ({ // Ensure card properties are copied
+            ...card,
+            objects: card.objects.map(applyObjectDefaults)
+          }))
+        };
+
+        resolve(processedStack);
       } catch (error) {
         reject(new Error(`Failed to load project: ${error instanceof Error ? error.message : 'Unknown error'}`));
       }
