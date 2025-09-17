@@ -16,6 +16,7 @@ interface CardCanvasProps {
   onOpenUrl: (url: string) => void;
   executeScript: (script: string) => void;
   onAddObject: (type: ObjectType, x: number, y: number) => void; // New prop
+  onDeleteObject: (objectId: string) => void; // Added this line
 }
 
 const CardCanvas: React.FC<CardCanvasProps> = ({
@@ -28,6 +29,7 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
   onOpenUrl,
   executeScript,
   onAddObject,
+  onDeleteObject,
 }) => {
   // デバッグ: 初期値確認
   console.log('CardCanvas stack.currentCardId:', stack.currentCardId);
@@ -158,6 +160,7 @@ const CardCanvas: React.FC<CardCanvasProps> = ({
                 onSwitchCard={onSwitchCard}
                 onOpenUrl={onOpenUrl}
                 executeScript={executeScript}
+                onDeleteObject={onDeleteObject} // Added this line
               />
             ))}
           </Layer>

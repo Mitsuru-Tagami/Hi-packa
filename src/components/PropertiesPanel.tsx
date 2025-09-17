@@ -14,6 +14,7 @@ interface PropertiesPanelProps {
   onDeleteCard: (cardId: string) => void;
   onUpdateCardDimensions: (cardId: string, width: number, height: number) => void;
   onUpdateCardName: (cardId: string, newName: string) => void;
+  onDeleteObject: (objectId: string) => void; // Added this line
 }
 
 // ユーティリティ関数を追加
@@ -43,7 +44,8 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   onDeleteCard,
   onUpdateCardDimensions,
   stack,
-  onUpdateCardName
+  onUpdateCardName,
+  onDeleteObject // Added this line
 }) => {
   // Object関連のローカルステート
   const [localX, setLocalX] = useState<string>('');
@@ -159,7 +161,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           <div style={{ marginBottom: '12px' }}>
             <label>{t('propertiesPanel.cardName')}:</label>
             <input
-              type="text"
+              type="number"
               value={localCardName}
               onChange={(e) => setLocalCardName(e.target.value)}
               onBlur={() => {
@@ -179,7 +181,9 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                 const selectedSize = PREDEFINED_CARD_SIZES.find(size => size.label === e.target.value);
                 if (selectedSize && selectedSize.width > 0) {
                   // Show warning dialog before applying changes
-                  const confirmed = window.confirm(t('propertiesPanel.cardSizeChangeWarning'));
+                  const confirmed = window.confirm(
+                    t('deleteCardWarning')
+                  );
                   if (confirmed) {
                     setLocalCardWidth(selectedSize.width.toString());
                     setLocalCardHeight(selectedSize.height.toString());
@@ -189,8 +193,6 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                     // Reset to current selection if user cancels
                     return;
                   }
-                } else {
-                  setSelectedSizeLabel(e.target.value);
                 }
               }}
               style={{ width: '100%', padding: '4px', marginTop: '4px' }}
@@ -225,7 +227,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                 value={localCardHeight}
                 onChange={(e) => setLocalCardHeight(e.target.value)}
                 onBlur={() => {
-                  const width = parseInt(localCardWidth);
+                  const width = parseInt(localCardHeight);
                   const height = parseInt(localCardHeight);
                   if (!isNaN(width) && !isNaN(height)) {
                     onUpdateCardDimensions(currentCard.id, width, height);
@@ -277,7 +279,10 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                 type="number"
                 value={localX}
                 onChange={(e) => handleNumberInputLocalChange(setLocalX, e)}
-                onBlur={() => handleNumberInputBlur('x', localX)}
+                onBlur={() => {
+                  const numValue = parseUnitValue(localX);
+                  handlePropertyChange('x', numValue);
+                }}
                 style={{ width: '100%', padding: '4px', marginTop: '4px' }}
               />
             </div>
@@ -287,7 +292,10 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                 type="number"
                 value={localY}
                 onChange={(e) => handleNumberInputLocalChange(setLocalY, e)}
-                onBlur={() => handleNumberInputBlur('y', localY)}
+                onBlur={() => {
+                  const numValue = parseUnitValue(localY);
+                  handlePropertyChange('y', numValue);
+                }}
                 style={{ width: '100%', padding: '4px', marginTop: '4px' }}
               />
             </div>
@@ -297,7 +305,10 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                 type="number"
                 value={localWidth}
                 onChange={(e) => handleNumberInputLocalChange(setLocalWidth, e)}
-                onBlur={() => handleNumberInputBlur('width', localWidth)}
+                onBlur={() => {
+                  const numValue = parseUnitValue(localWidth);
+                  handlePropertyChange('width', numValue);
+                }}
                 style={{ width: '100%', padding: '4px', marginTop: '4px' }}
               />
             </div>
@@ -307,7 +318,10 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                 type="number"
                 value={localHeight}
                 onChange={(e) => handleNumberInputLocalChange(setLocalHeight, e)}
-                onBlur={() => handleNumberInputBlur('height', localHeight)}
+                onBlur={() => {
+                  const numValue = parseUnitValue(localHeight);
+                  handlePropertyChange('height', numValue);
+                }}
                 style={{ width: '100%', padding: '4px', marginTop: '4px' }}
               />
             </div>
