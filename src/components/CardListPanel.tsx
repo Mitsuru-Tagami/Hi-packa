@@ -75,7 +75,7 @@ const CardListPanel: React.FC<CardListPanelProps> = ({
       {/* Project Operations Section */}
       <Box sx={{ mt: 2 }}>
         <Typography variant="h6" gutterBottom>
-          プロジェクト操作
+          {t('projectOperations')}
         </Typography>
         
         {/* Export HTML Button */}
@@ -86,7 +86,7 @@ const CardListPanel: React.FC<CardListPanelProps> = ({
             fullWidth
             color="success"
           >
-            HTML書き出し
+            {t('exportHTML')}
           </Button>
         </Box>
         
@@ -98,7 +98,7 @@ const CardListPanel: React.FC<CardListPanelProps> = ({
             fullWidth
             color="secondary"
           >
-            プロジェクト保存
+            {t('saveProject')}
           </Button>
         </Box>
         
@@ -118,7 +118,7 @@ const CardListPanel: React.FC<CardListPanelProps> = ({
               fullWidth
               color="secondary"
             >
-              プロジェクト読み込み
+              {t('loadProject')}
             </Button>
           </label>
         </Box>

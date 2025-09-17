@@ -69,8 +69,11 @@
     "runMode": "実行",
     "editMode": "編集",
     "exportHtml": "HTML書き出し",
+    "saveProject": "プロジェクト保存",
+    "loadProject": "プロジェクト読み込み",
     "cards": "カード",
     "mode": "モード",
+    "projectOperations": "プロジェクト操作",
     "propertiesPanel": {
       "title": "プロパティパネル",
       "selectedObjectLabel": "選択中のオブジェクト: {{id}} ({{type}})",

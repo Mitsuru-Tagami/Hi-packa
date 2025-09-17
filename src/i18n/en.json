@@ -73,6 +73,7 @@
     "loadProject": "Load Project",
     "cards": "Cards",
     "mode": "Mode",
+    "projectOperations": "Project Operations",
     "propertiesPanel": {
       "title": "Properties Panel",
       "selectedObjectLabel": "Selected Object: {{id}} ({{type}})",
