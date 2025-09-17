@@ -158,6 +158,11 @@
       "addButton": "Add Button",
       "addTextBox": "Add Text Box",
       "addImage": "Add Image"
-    }
+    },
+    "exportHtmlError": "Failed to export HTML. Please try again.",
+    "saveProjectError": "Failed to save project. Please try again.",
+    "loadProjectError": "Failed to load project: {{errorMessage}}",
+    "invalidFileFormat": "Invalid file format. Please select a .json or .hipacka file.",
+    "projectLoadedSuccessfully": "Project loaded successfully!"
   }
 }

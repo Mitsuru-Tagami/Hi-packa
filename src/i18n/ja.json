@@ -160,6 +160,11 @@
       "addButton": "ボタンを追加",
       "addTextBox": "テキストボックスを追加",
       "addImage": "画像を追加"
-    }
+    },
+    "exportHtmlError": "HTMLのエクスポートに失敗しました。もう一度お試しください。",
+    "saveProjectError": "プロジェクトの保存に失敗しました。もう一度お試しください。",
+    "loadProjectError": "プロジェクトの読み込みに失敗しました: {{errorMessage}}",
+    "invalidFileFormat": "無効なファイル形式です。.jsonまたは.hipackaファイルを選択してください。",
+    "projectLoadedSuccessfully": "プロジェクトが正常に読み込まれました！"
   }
 }

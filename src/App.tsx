@@ -252,7 +252,7 @@ function App() {
       downloadHTML(htmlContent, 'hi-packa-export.html');
     } catch (error) {
       console.error('Failed to export HTML:', error);
-      alert('Failed to export HTML. Please try again.');
+      alert(t('exportHtmlError'));
     }
   };
 
@@ -261,24 +261,24 @@ function App() {
       saveProject(stack);
     } catch (error) {
       console.error('Failed to save project:', error);
-      alert('Failed to save project. Please try again.');
+      alert(t('saveProjectError'));
     }
   };
 
   const handleLoadProject = async (file: File) => {
     try {
       if (!validateProjectFile(file)) {
-        alert('Invalid file format. Please select a .json or .hipacka file.');
+        alert(t('invalidFileFormat'));
         return;
       }
       
       const loadedStack = await loadProject(file);
       setStack(loadedStack);
       setSelectedObject(null);
-      alert('Project loaded successfully!');
+      alert(t('projectLoadedSuccessfully'));
     } catch (error) {
       console.error('Failed to load project:', error);
-      alert(`Failed to load project: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      alert(t('loadProjectError', { errorMessage: error instanceof Error ? error.message : 'Unknown error' }));
     }
   };
 
