@@ -4,6 +4,7 @@ import { initialStack } from './initialData';
 import type { Stack, StackObject, ObjectType } from './types';
 import { t } from './i18n';
 import { exportToHTML, downloadHTML } from './utils/htmlExport';
+import { saveProject, loadProject, validateProjectFile } from './utils/projectManager';
 
 function App() {
   const [stack, setStack] = useState<Stack>(initialStack);
@@ -255,6 +256,32 @@ function App() {
     }
   };
 
+  const handleSaveProject = () => {
+    try {
+      saveProject(stack);
+    } catch (error) {
+      console.error('Failed to save project:', error);
+      alert('Failed to save project. Please try again.');
+    }
+  };
+
+  const handleLoadProject = async (file: File) => {
+    try {
+      if (!validateProjectFile(file)) {
+        alert('Invalid file format. Please select a .json or .hipacka file.');
+        return;
+      }
+      
+      const loadedStack = await loadProject(file);
+      setStack(loadedStack);
+      setSelectedObject(null);
+      alert('Project loaded successfully!');
+    } catch (error) {
+      console.error('Failed to load project:', error);
+      alert(`Failed to load project: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
   return (
     <Layout
       stack={stack}
@@ -278,6 +305,8 @@ function App() {
       onAddCard={handleAddCard}
       onUpdateCardName={handleUpdateCardName}
       onExportHTML={handleExportHTML}
+      onSaveProject={handleSaveProject}
+      onLoadProject={handleLoadProject}
     />
   );
 }

@@ -69,6 +69,8 @@
     "runMode": "Run",
     "editMode": "Edit",
     "exportHtml": "Export HTML",
+    "saveProject": "Save Project",
+    "loadProject": "Load Project",
     "cards": "Cards",
     "mode": "Mode",
     "propertiesPanel": {

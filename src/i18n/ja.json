@@ -114,6 +114,8 @@
       "sizeIPad": "iPad (768×1024)",
       "sizeDesktop": "デスクトップ (1280×720)",
       "exportHTML": "HTML書き出し",
+      "saveProject": "プロジェクト保存",
+      "loadProject": "プロジェクト読み込み",
       "cardSizeChangeWarning": "カードサイズを変更すると、配置されたオブジェクトのレイアウトが崩れるおそれがあります。続行しますか？",
       "cardProperties": "カードのプロパティ",
       "cardName": "カード名",

@@ -28,6 +28,8 @@ interface LayoutProps {
   onUpdateCardName: (cardId: string, newName: string) => void;
   onDeleteCard: (cardId: string) => void;
   onExportHTML: () => void;
+  onSaveProject: () => void;
+  onLoadProject: (file: File) => Promise<void>;
 }
 
 const Layout: React.FC<LayoutProps> = ({
@@ -52,6 +54,8 @@ const Layout: React.FC<LayoutProps> = ({
   onUpdateCardName,
   onDeleteCard,
   onExportHTML,
+  onSaveProject,
+  onLoadProject,
 }) => {
   const currentCard = stack.cards.find(card => card.id === stack.currentCardId);
 
@@ -71,7 +75,7 @@ const Layout: React.FC<LayoutProps> = ({
           height: '100%', 
           display: 'flex', 
           flexDirection: 'column',
-          overflow: 'hidden'
+          overflow: 'auto'
         }}>
           <CardListPanel
             stack={stack}
@@ -81,6 +85,8 @@ const Layout: React.FC<LayoutProps> = ({
             onOpenSettingsModal={onOpenSettingsModal}
             onAddCard={onAddCard}
             onExportHTML={onExportHTML}
+            onSaveProject={onSaveProject}
+            onLoadProject={onLoadProject}
           />
         </Box>
 

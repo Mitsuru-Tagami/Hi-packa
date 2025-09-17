@@ -16,6 +16,8 @@ interface CardListPanelProps {
   onOpenSettingsModal: () => void;
   onAddCard: () => void;
   onExportHTML: () => void;
+  onSaveProject: () => void;
+  onLoadProject: (file: File) => Promise<void>;
 }
 
 const CardListPanel: React.FC<CardListPanelProps> = ({
@@ -26,7 +28,17 @@ const CardListPanel: React.FC<CardListPanelProps> = ({
   onOpenSettingsModal,
   onAddCard,
   onExportHTML,
+  onSaveProject,
+  onLoadProject,
 }) => {
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      onLoadProject(file);
+      // Reset the input so the same file can be selected again
+      event.target.value = '';
+    }
+  };
   return (
     <Box sx={{ borderRight: '1px solid #ddd', height: '100vh', p: 2 }}>
       <Typography variant="h6" gutterBottom>
@@ -57,16 +69,59 @@ const CardListPanel: React.FC<CardListPanelProps> = ({
         </Button>
       </Box>
       
-      {/* Export HTML Button - moved here from properties panel */}
-      <Box sx={{ mt: 1 }}>
-        <Button
-          variant="contained"
-          onClick={onExportHTML}
-          fullWidth
-          color="success"
-        >
-          {t('exportHTML')}
-        </Button>
+      {/* Separator */}
+      <Box sx={{ mt: 3, mb: 2, borderTop: '1px solid #ddd' }} />
+      
+      {/* Project Operations Section */}
+      <Box sx={{ mt: 2 }}>
+        <Typography variant="h6" gutterBottom>
+          プロジェクト操作
+        </Typography>
+        
+        {/* Export HTML Button */}
+        <Box sx={{ mt: 1 }}>
+          <Button
+            variant="contained"
+            onClick={onExportHTML}
+            fullWidth
+            color="success"
+          >
+            HTML書き出し
+          </Button>
+        </Box>
+        
+        {/* Save Project Button */}
+        <Box sx={{ mt: 1 }}>
+          <Button
+            variant="contained"
+            onClick={onSaveProject}
+            fullWidth
+            color="secondary"
+          >
+            プロジェクト保存
+          </Button>
+        </Box>
+        
+        {/* Load Project Button */}
+        <Box sx={{ mt: 1 }}>
+          <input
+            accept=".json,.hipacka"
+            style={{ display: 'none' }}
+            id="load-project-file"
+            type="file"
+            onChange={handleFileSelect}
+          />
+          <label htmlFor="load-project-file">
+            <Button
+              variant="outlined"
+              component="span"
+              fullWidth
+              color="secondary"
+            >
+              プロジェクト読み込み
+            </Button>
+          </label>
+        </Box>
       </Box>
       
       <Box sx={{ mt: 3 }}>
