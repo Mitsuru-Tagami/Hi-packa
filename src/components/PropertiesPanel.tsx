@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import type { StackObject, BorderWidth, TextAlign, Card, Stack } from '../types';
 import { t } from '../i18n';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 interface PropertiesPanelProps {
   selectedObject: StackObject | null;
@@ -141,15 +150,16 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   };
 
   return (
-    <div style={{ padding: '16px', height: '100%', overflow: 'auto' }}>
+    <Box sx={{ p: 2, height: '100%', overflowY: 'auto' }}>
       {/* Card Properties Section */}
       {currentCard && (
-        <div style={{ marginBottom: '24px', padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}>
+        <Box sx={{ mb: 3, p: 1.5, border: '1px solid #ddd', borderRadius: 1 }}>
           
-          <div style={{ marginBottom: '12px' }}>
-            <label>{t('propertiesPanel.cardName')}:</label>
-            <input
-              type="number"
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <TextField
+              label={t('propertiesPanel.cardName')}
+              variant="outlined"
+              size="small"
               value={localCardName}
               onChange={(e) => setLocalCardName(e.target.value)}
               onBlur={() => {
@@ -157,106 +167,90 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                   onUpdateCardName(currentCard.id, localCardName);
                 }
               }}
-              style={{ width: '100%', padding: '4px', marginTop: '4px' }}
             />
-          </div>
+          </FormControl>
 
-          <div style={{ marginBottom: '12px' }}>
-            <label>{t('propertiesPanel.sizePreset')}:</label>
-            <select
+          <FormControl fullWidth sx={{ mb: 2 }} size="small">
+            <InputLabel>{t('propertiesPanel.sizePreset')}</InputLabel>
+            <Select
+              label={t('propertiesPanel.sizePreset')}
               value={selectedSizeLabel}
               onChange={(e) => {
                 const selectedSize = PREDEFINED_CARD_SIZES.find(size => size.label === e.target.value);
                 if (selectedSize && selectedSize.width > 0) {
                   // Show warning dialog before applying changes
-                  const confirmed = window.confirm(
-                    t('deleteCardWarning')
-                  );
-                  if (confirmed) {
+                  if (window.confirm(t('deleteCardWarning'))) {
                     setLocalCardWidth(selectedSize.width.toString());
                     setLocalCardHeight(selectedSize.height.toString());
                     onUpdateCardDimensions(currentCard.id, selectedSize.width, selectedSize.height);
                     setSelectedSizeLabel(e.target.value);
-                  } else {
-                    // Reset to current selection if user cancels
-                    return;
                   }
+                } else {
+                  setSelectedSizeLabel(e.target.value);
                 }
               }}
-              style={{ width: '100%', padding: '4px', marginTop: '4px' }}
             >
               {PREDEFINED_CARD_SIZES.map(size => (
-                <option key={size.label} value={size.label}>{t(`propertiesPanel.${size.label}`)}</option>
+                <MenuItem key={size.label} value={size.label}>{t(`propertiesPanel.${size.label}`)}</MenuItem>
               ))}
-            </select>
-          </div>
+            </Select>
+          </FormControl>
 
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-            <div style={{ flex: 1 }}>
-              <label>{t('propertiesPanel.width')}:</label>
-              <input
-                type="number"
-                value={localCardWidth}
-                onChange={(e) => setLocalCardWidth(e.target.value)}
-                onBlur={() => {
-                  const width = parseInt(localCardWidth);
-                  const height = parseInt(localCardHeight);
-                  if (!isNaN(width) && !isNaN(height)) {
-                    onUpdateCardDimensions(currentCard.id, width, height);
-                  }
-                }}
-                style={{ width: '100%', padding: '4px', marginTop: '4px' }}
-              />
-            </div>
-            <div style={{ flex: 1 }}>
-              <label>{t('propertiesPanel.height')}:</label>
-              <input
-                type="number"
-                value={localCardHeight}
-                onChange={(e) => setLocalCardHeight(e.target.value)}
-                onBlur={() => {
-                  const width = parseInt(localCardHeight);
-                  const height = parseInt(localCardHeight);
-                  if (!isNaN(width) && !isNaN(height)) {
-                    onUpdateCardDimensions(currentCard.id, width, height);
-                  }
-                }}
-                style={{ width: '100%', padding: '4px', marginTop: '4px' }}
-              />
-            </div>
-          </div>
-
-          <button
-            onClick={() => {
-              if (stack.cards.length > 1) {
-                const confirmed = window.confirm(
-                  t('deleteCardWarning')
-                );
-                if (confirmed) {
-                  onDeleteCard(currentCard.id);
+          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+            <TextField
+              label={t('propertiesPanel.width')}
+              type="number"
+              variant="outlined"
+              size="small"
+              fullWidth
+              value={localCardWidth}
+              onChange={(e) => setLocalCardWidth(e.target.value)}
+              onBlur={() => {
+                const width = parseInt(localCardWidth);
+                const height = parseInt(localCardHeight);
+                if (currentCard && !isNaN(width) && !isNaN(height)) {
+                  onUpdateCardDimensions(currentCard.id, width, height);
                 }
+              }}
+            />
+            <TextField
+              label={t('propertiesPanel.height')}
+              type="number"
+              variant="outlined"
+              size="small"
+              fullWidth
+              value={localCardHeight}
+              onChange={(e) => setLocalCardHeight(e.target.value)}
+              onBlur={() => {
+                const width = parseInt(localCardWidth);
+                const height = parseInt(localCardHeight);
+                if (currentCard && !isNaN(width) && !isNaN(height)) {
+                  onUpdateCardDimensions(currentCard.id, width, height);
+                }
+              }}
+            />
+          </Box>
+
+          <Button
+            variant="contained"
+            color="error"
+            fullWidth
+            onClick={() => {
+              if (window.confirm(t('deleteCardWarning'))) {
+                onDeleteCard(currentCard.id);
               }
             }}
-            style={{
-              width: '100%',
-              padding: '8px',
-              marginTop: '8px',
-              backgroundColor: stack.cards.length > 1 ? '#dc3545' : '#ccc',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: stack.cards.length > 1 ? 'pointer' : 'not-allowed'
-            }}
             disabled={stack.cards.length <= 1}
+            sx={{ mt: 1 }}
           >
             {t('propertiesPanel.deleteCard')}
-          </button>
-        </div>
+          </Button>
+        </Box>
       )}
 
       {/* Object Properties Section */}
       {selectedObject ? (
-        <div style={{ padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}>
+        <Box sx={{ p: 1.5, border: '1px solid #ddd', borderRadius: 1 }}>
           <h4>{{
             text: t('text'),
             image: t('imageName'),
@@ -264,164 +258,158 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           }[selectedObject.type] || selectedObject.type}</h4>
           
           {/* Position and Size */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
-            <div>
-              <label>{t('propertiesPanel.positionX')}:</label>
-              <input
-                type="number"
-                value={localX}
-                onChange={(e) => handleNumberInputLocalChange(setLocalX, e)}
-                onBlur={() => {
-                  const numValue = parseUnitValue(localX);
-                  handlePropertyChange('x', numValue);
-                }}
-                style={{ width: '100%', padding: '4px', marginTop: '4px' }}
-              />
-            </div>
-            <div>
-              <label>{t('propertiesPanel.positionY')}:</label>
-              <input
-                type="number"
-                value={localY}
-                onChange={(e) => handleNumberInputLocalChange(setLocalY, e)}
-                onBlur={() => {
-                  const numValue = parseUnitValue(localY);
-                  handlePropertyChange('y', numValue);
-                }}
-                style={{ width: '100%', padding: '4px', marginTop: '4px' }}
-              />
-            </div>
-            <div>
-              <label>{t('propertiesPanel.width')}:</label>
-              <input
-                type="number"
-                value={localWidth}
-                onChange={(e) => handleNumberInputLocalChange(setLocalWidth, e)}
-                onBlur={() => {
-                  const numValue = parseUnitValue(localWidth);
-                  handlePropertyChange('width', numValue);
-                }}
-                style={{ width: '100%', padding: '4px', marginTop: '4px' }}
-              />
-            </div>
-            <div>
-              <label>{t('propertiesPanel.height')}:</label>
-              <input
-                type="number"
-                value={localHeight}
-                onChange={(e) => handleNumberInputLocalChange(setLocalHeight, e)}
-                onBlur={() => {
-                  const numValue = parseUnitValue(localHeight);
-                  handlePropertyChange('height', numValue);
-                }}
-                style={{ width: '100%', padding: '4px', marginTop: '4px' }}
-              />
-            </div>
-          </div>
+          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mb: 2 }}>
+            <TextField
+              label={t('propertiesPanel.positionX')}
+              type="number"
+              variant="outlined"
+              size="small"
+              value={localX}
+              onChange={(e) => handleNumberInputLocalChange(setLocalX, e)}
+              onBlur={() => handlePropertyChange('x', parseUnitValue(localX))}
+            />
+            <TextField
+              label={t('propertiesPanel.positionY')}
+              type="number"
+              variant="outlined"
+              size="small"
+              value={localY}
+              onChange={(e) => handleNumberInputLocalChange(setLocalY, e)}
+              onBlur={() => handlePropertyChange('y', parseUnitValue(localY))}
+            />
+            <TextField
+              label={t('propertiesPanel.width')}
+              type="number"
+              variant="outlined"
+              size="small"
+              value={localWidth}
+              onChange={(e) => handleNumberInputLocalChange(setLocalWidth, e)}
+              onBlur={() => handlePropertyChange('width', parseUnitValue(localWidth))}
+            />
+            <TextField
+              label={t('propertiesPanel.height')}
+              type="number"
+              variant="outlined"
+              size="small"
+              value={localHeight}
+              onChange={(e) => handleNumberInputLocalChange(setLocalHeight, e)}
+              onBlur={() => handlePropertyChange('height', parseUnitValue(localHeight))}
+            />
+          </Box>
 
           {/* Text Content */}
-          <div style={{ marginBottom: '12px' }}>
-            <label>{t('propertiesPanel.textLabel')}:</label>
-            <textarea
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <TextField
+              label={t('propertiesPanel.textLabel')}
+              variant="outlined"
+              multiline
+              rows={3}
               value={localText}
               onChange={(e) => {
                 setLocalText(e.target.value);
                 handlePropertyChange('text', e.target.value);
               }}
-              style={{ width: '100%', padding: '4px', marginTop: '4px', minHeight: '60px' }}
             />
-          </div>
+          </FormControl>
 
           {/* Text Alignment */}
-          <div style={{ marginBottom: '12px' }}>
-            <label>{t('propertiesPanel.textAlign')}:</label>
-            <select
+          <FormControl fullWidth sx={{ mb: 2 }} size="small">
+            <InputLabel>{t('propertiesPanel.textAlign')}</InputLabel>
+            <Select
+              label={t('propertiesPanel.textAlign')}
               value={localTextAlign}
               onChange={(e) => {
                 const value = e.target.value as TextAlign;
                 setLocalTextAlign(value);
                 handlePropertyChange('textAlign', value);
               }}
-              style={{ width: '100%', padding: '4px', marginTop: '4px' }}
             >
-              <option value="left">{t('propertiesPanel.alignLeft')}</option>
-              <option value="center">{t('propertiesPanel.alignCenter')}</option>
-              <option value="right">{t('propertiesPanel.alignRight')}</option>
-            </select>
-          </div>
+              <MenuItem value="left">{t('propertiesPanel.alignLeft')}</MenuItem>
+              <MenuItem value="center">{t('propertiesPanel.alignCenter')}</MenuItem>
+              <MenuItem value="right">{t('propertiesPanel.alignRight')}</MenuItem>
+            </Select>
+          </FormControl>
 
           {/* Colors */}
-          <div style={{ marginBottom: '12px' }}>
-            <label>{t('propertiesPanel.textColor')}:</label>
-            <input
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <TextField
+              label={t('propertiesPanel.textColor')}
+              variant="outlined"
               type="color"
+              size="small"
               value={localColor || '#000000'}
               onChange={(e) => {
                 setLocalColor(e.target.value);
                 handlePropertyChange('color', e.target.value);
               }}
-              style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+              fullWidth
             />
-          </div>
+          </FormControl>
 
-          <div style={{ marginBottom: '12px' }}>
-            <label>
-              <input
-                type="checkbox"
-                checked={isTransparentBackground}
-                onChange={handleTransparentToggle}
-                style={{ marginRight: '8px' }}
-              />
-              {t('propertiesPanel.transparentBackground')}
-            </label>
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={isTransparentBackground}
+                  onChange={handleTransparentToggle}
+                />
+              }
+              label={t('propertiesPanel.transparentBackground')}
+            />
             {!isTransparentBackground && (
-              <input
+              <TextField
+                label={t('propertiesPanel.backgroundColor')}
+                variant="outlined"
                 type="color"
+                size="small"
                 value={localBackgroundColor || '#ffffff'}
                 onChange={handleBackgroundColorChange}
-                style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+                fullWidth
               />
             )}
-          </div>
+          </FormControl>
 
           {/* Border */}
-          <div style={{ marginBottom: '12px' }}>
-            <label>{t('propertiesPanel.borderWidth')}:</label>
-            <select
+          <FormControl fullWidth sx={{ mb: 2 }} size="small">
+            <InputLabel>{t('propertiesPanel.borderWidth')}</InputLabel>
+            <Select
+              label={t('propertiesPanel.borderWidth')}
               value={localBorderWidth}
               onChange={(e) => {
                 const value = e.target.value as BorderWidth;
                 setLocalBorderWidth(value);
                 handlePropertyChange('borderWidth', value);
               }}
-              style={{ width: '100%', padding: '4px', marginTop: '4px' }}
             >
-              <option value="none">{t('propertiesPanel.borderNone')}</option>
-              <option value="thin">{t('propertiesPanel.borderThin')}</option>
-              <option value="medium">{t('propertiesPanel.borderMedium')}</option>
-              <option value="thick">{t('propertiesPanel.borderThick')}</option>
-            </select>
-          </div>
+              <MenuItem value="none">{t('propertiesPanel.borderNone')}</MenuItem>
+              <MenuItem value="thin">{t('propertiesPanel.borderThin')}</MenuItem>
+              <MenuItem value="medium">{t('propertiesPanel.borderMedium')}</MenuItem>
+              <MenuItem value="thick">{t('propertiesPanel.borderThick')}</MenuItem>
+            </Select>
+          </FormControl>
 
-          <div style={{ marginBottom: '12px' }}>
-            <label>{t('propertiesPanel.borderColor')}:</label>
-            <input
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <TextField
+              label={t('propertiesPanel.borderColor')}
+              variant="outlined"
               type="color"
+              size="small"
               value={localBorderColor || '#000000'}
               onChange={(e) => {
                 setLocalBorderColor(e.target.value);
                 handlePropertyChange('borderColor', e.target.value);
               }}
-              style={{ width: '100%', padding: '4px', marginTop: '4px' }}
+              fullWidth
             />
-          </div>
+          </FormControl>
 
           {/* Button specific properties */}
           {selectedObject.type === 'button' && (
-            <>
-              <div style={{ marginBottom: '12px' }}>
-                <label>{t('propertiesPanel.buttonAction')}:</label>
-                <select
+            <Box sx={{ mt: 2 }}>
+              <FormControl fullWidth sx={{ mb: 2 }} size="small">
+                <InputLabel>{t('propertiesPanel.buttonAction')}</InputLabel>
+                <Select
+                  label={t('propertiesPanel.buttonAction')}
                   value={selectedObject.action || 'none'}
                   onChange={(e) => {
                     const value = e.target.value as 'none' | 'jumpToCard' | 'jumpToCardAnchor' | 'openUrl' | 'script';
@@ -431,122 +419,122 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                       handlePropertyChange('src', '');
                     }
                   }}
-                  style={{ width: '100%', padding: '4px', marginTop: '4px' }}
                 >
-                  <option value="none">{t('propertiesPanel.actionNone')}</option>
-                  <option value="jumpToCard">{t('propertiesPanel.actionJumpToCard')}</option>
-                  <option value="jumpToCardAnchor">{t('propertiesPanel.actionJumpToCardAnchor')}</option>
-                  <option value="openUrl">{t('propertiesPanel.actionOpenUrl')}</option>
-                  {isMagicEnabled && <option value="script">{t('propertiesPanel.actionScript')}</option>}
-                </select>
-              </div>
+                  <MenuItem value="none">{t('propertiesPanel.actionNone')}</MenuItem>
+                  <MenuItem value="jumpToCard">{t('propertiesPanel.actionJumpToCard')}</MenuItem>
+                  <MenuItem value="jumpToCardAnchor">{t('propertiesPanel.actionJumpToCardAnchor')}</MenuItem>
+                  <MenuItem value="openUrl">{t('propertiesPanel.actionOpenUrl')}</MenuItem>
+                  {isMagicEnabled && <MenuItem value="script">{t('propertiesPanel.actionScript')}</MenuItem>}
+                </Select>
+              </FormControl>
 
               {(selectedObject.action === 'jumpToCard' || selectedObject.action === 'jumpToCardAnchor') && (
-                <div style={{ marginBottom: '12px' }}>
-                  <label>{t('propertiesPanel.targetCard')}:</label>
-                  <select
+                <FormControl fullWidth sx={{ mb: 2 }} size="small">
+                  <InputLabel>{t('propertiesPanel.targetCard')}</InputLabel>
+                  <Select
+                    label={t('propertiesPanel.targetCard')}
                     value={selectedObject.jumpToCardId || ''}
                     onChange={(e) => {
                       handlePropertyChange('jumpToCardId', e.target.value || null);
                     }}
-                    style={{ width: '100%', padding: '4px', marginTop: '4px' }}
                   >
-                    <option value="">{t('propertiesPanel.selectCard')}</option>
+                    <MenuItem value="">{t('propertiesPanel.selectCard')}</MenuItem>
                     {stack.cards.map(card => (
-                      <option key={card.id} value={card.id}>{card.name}</option>
+                      <MenuItem key={card.id} value={card.id}>{card.name}</MenuItem>
                     ))}
-                  </select>
-                </div>
+                  </Select>
+                </FormControl>
               )}
 
               {selectedObject.action === 'openUrl' && (
-                <div style={{ marginBottom: '12px' }}>
-                  <label>{t('propertiesPanel.url')}:</label>
-                  <input
-                    type="text"
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                  <TextField
+                    label={t('propertiesPanel.url')}
+                    variant="outlined"
+                    size="small"
                     value={selectedObject.src || ''}
                     onChange={(e) => {
                       handlePropertyChange('src', e.target.value);
                     }}
                     placeholder={t('propertiesPanel.urlPlaceholder')}
-                    style={{ width: '100%', padding: '4px', marginTop: '4px' }}
                   />
-                </div>
+                </FormControl>
               )}
-            </>
+            </Box>
           )}
 
           {/* Image specific properties */}
           {selectedObject.type === 'image' && (
-            <>
-              <div style={{ marginBottom: '12px' }}>
-                <label>{t('propertiesPanel.imageSource')}:</label>
-                <input
-                  type="text"
+            <Box sx={{ mt: 2 }}>
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <TextField
+                  label={t('propertiesPanel.imageSource')}
+                  variant="outlined"
+                  size="small"
                   value={localSrc}
                   onChange={(e) => {
                     setLocalSrc(e.target.value);
                     handlePropertyChange('src', e.target.value);
                   }}
                   placeholder={t('propertiesPanel.imagePlaceholder')}
-                  style={{ width: '100%', padding: '4px', marginTop: '4px' }}
                 />
-              </div>
-              <div style={{ marginBottom: '12px' }}>
-                <label>{t('propertiesPanel.objectFit')}:</label>
-                <select
+              </FormControl>
+              <FormControl fullWidth sx={{ mb: 2 }} size="small">
+                <InputLabel>{t('propertiesPanel.objectFit')}</InputLabel>
+                <Select
+                  label={t('propertiesPanel.objectFit')}
                   value={localObjectFit}
                   onChange={(e) => {
                     const value = e.target.value as 'contain' | 'fill';
                     setLocalObjectFit(value);
                     handlePropertyChange('objectFit', value);
                   }}
-                  style={{ width: '100%', padding: '4px', marginTop: '4px' }}
                 >
-                  <option value="contain">{t('propertiesPanel.objectFitContain')}</option>
-                  <option value="fill">{t('propertiesPanel.objectFitFill')}</option>
-                </select>
-              </div>
-            </>
+                  <MenuItem value="contain">{t('propertiesPanel.objectFitContain')}</MenuItem>
+                  <MenuItem value="fill">{t('propertiesPanel.objectFitFill')}</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
           )}
 
           {/* Script Section */}
           {isMagicEnabled && (
-            <div style={{ marginBottom: '12px' }}>
-              <label>{t('propertiesPanel.scriptLabel')}:</label>
-              <textarea
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <TextField
+                label={t('propertiesPanel.scriptLabel')}
+                variant="outlined"
+                multiline
+                rows={4}
                 value={localScript}
                 onChange={(e) => {
                   setLocalScript(e.target.value);
                   handlePropertyChange('script', e.target.value);
                 }}
                 placeholder={t('propertiesPanel.scriptPlaceholder')}
-                style={{ width: '100%', padding: '4px', marginTop: '4px', minHeight: '80px', fontFamily: 'monospace' }}
+                InputProps={{
+                  style: { fontFamily: 'monospace' }
+                }}
               />
-            </div>
+            </FormControl>
           )}
 
           {/* Delete Object Button */}
-          <button
+          <Button
+            variant="contained"
+            color="error"
+            fullWidth
             onClick={() => onDeleteObject(selectedObject.id)}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#ff4444',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
+            sx={{ mt: 2 }}
           >
             {t('propertiesPanel.deleteButton')}
-          </button>
-        </div>
+          </Button>
+        </Box>
       ) : (
-        <div style={{ padding: '12px', textAlign: 'center', color: '#666' }}>
+        <Box sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>
           <p>{t('propertiesPanel.selectObjectMessage')}</p>
-        </div>
+        </Box>
       )}
-     </div>
+    </Box>
   );
 };
 
