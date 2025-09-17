@@ -11,6 +11,7 @@ interface StackObjectNodeProps {
   onSwitchCard: (cardId: string) => void;
   onOpenUrl: (url: string) => void;
   executeScript: (script: string) => void;
+  onDeleteObject: (objectId: string) => void;
 }
 
 // Mapping for BorderWidth to pixel values

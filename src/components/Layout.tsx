@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import Box from '@mui/material/Box';
 import CardListPanel from './CardListPanel';
-import CardCanvas from '././CardCanvas';
-import { PropertiesPanel } from './PropertiesPanel';
-import { SettingsModalComponent as SettingsModal } from './SettingsModal'; // Corrected import
-import type { Stack, StackObject, ObjectType, Card } from '../types';
+import CardCanvas from './CardCanvas';
+
+// Dynamically import heavy components
+const PropertiesPanel = lazy(() => import('./PropertiesPanel').then(module => ({ default: module.PropertiesPanel })));
+const SettingsModal = lazy(() => import('./SettingsModal').then(module => ({ default: module.SettingsModalComponent })));
+
+import type { Stack, StackObject, ObjectType } from '../types';
 
 interface LayoutProps {
   stack: Stack;
@@ -80,6 +83,7 @@ const Layout: React.FC<LayoutProps> = ({
           onSelectObject={onSelectObject}
           onUpdateObject={onUpdateObject}
           isRunMode={isRunMode}
+          onSwitchCard={onSwitchCard}
           onOpenUrl={onOpenUrl}
           executeScript={executeScript}
           onAddObject={onAddObject}
@@ -96,28 +100,29 @@ const Layout: React.FC<LayoutProps> = ({
           flexDirection: 'column',
           overflow: 'auto'
         }}>
-        <PropertiesPanel
-          stack={stack}
-          selectedObject={selectedObject}
-          onSelectObject={onSelectObject}
-          onUpdateObject={onUpdateObject}
-          onOpenUrl={onOpenUrl}
-          executeScript={executeScript}
-          isMagicEnabled={isMagicEnabled}
-          currentCard={currentCard}
-          onDeleteCard={onDeleteCard}
-          onUpdateCardDimensions={onUpdateCardDimensions}
-          onUpdateCardName={onUpdateCardName}
-          onDeleteObject={onDeleteObject}
-        />
+        <Suspense fallback={<div>Loading...</div>}>
+          <PropertiesPanel
+            stack={stack}
+            selectedObject={selectedObject}
+            onUpdateObject={onUpdateObject}
+            isMagicEnabled={isMagicEnabled}
+            currentCard={currentCard}
+            onDeleteCard={onDeleteCard}
+            onUpdateCardDimensions={onUpdateCardDimensions}
+            onUpdateCardName={onUpdateCardName}
+            onDeleteObject={onDeleteObject}
+          />
+        </Suspense>
       </Box>
 
-      <SettingsModal
-        isOpen={isSettingsModalOpen}
-        onClose={onCloseSettingsModal}
-        onSetMagicEnabled={onSetMagicEnabled}
-        isMagicEnabled={isMagicEnabled}
-      />
+      <Suspense fallback={null}>
+        <SettingsModal
+          isOpen={isSettingsModalOpen}
+          onClose={onCloseSettingsModal}
+          onSetMagicEnabled={onSetMagicEnabled}
+          isMagicEnabled={isMagicEnabled}
+        />
+      </Suspense>
     </Box>
   );
 };

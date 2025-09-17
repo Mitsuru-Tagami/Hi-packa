@@ -1,4 +1,4 @@
-import type { Stack, StackObject, ObjectType, TextAlign, BorderWidth, ButtonAction } from '../types';
+import type { Stack, StackObject } from '../types';
 
 // プロジェクトファイルの形式
 interface ProjectFile {

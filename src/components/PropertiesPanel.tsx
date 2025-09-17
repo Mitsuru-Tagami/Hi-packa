@@ -4,10 +4,7 @@ import { t } from '../i18n';
 
 interface PropertiesPanelProps {
   selectedObject: StackObject | null;
-  onSelectObject: (object: StackObject | null) => void;
   onUpdateObject: (object: StackObject) => void;
-  onOpenUrl: (url: string) => void;
-  executeScript: (script: string) => void;
   isMagicEnabled: boolean;
   stack: Stack;
   currentCard: Card | null;
@@ -35,10 +32,7 @@ const PREDEFINED_CARD_SIZES = [
 
 export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   selectedObject,
-  onSelectObject,
   onUpdateObject,
-  onOpenUrl,
-  executeScript,
   isMagicEnabled,
   currentCard,
   onDeleteCard,
@@ -129,11 +123,6 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
   const handleNumberInputLocalChange = (setter: React.Dispatch<React.SetStateAction<string>>, e: React.ChangeEvent<HTMLInputElement>) => {
     setter(e.target.value);
-  };
-
-  const handleNumberInputBlur = (key: keyof StackObject, localValue: string) => {
-    const numValue = parseUnitValue(localValue);
-    handlePropertyChange(key, numValue);
   };
 
   const handleTransparentToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
