@@ -163,6 +163,7 @@
     "saveProjectError": "Failed to save project. Please try again.",
     "loadProjectError": "Failed to load project: {{errorMessage}}",
     "invalidFileFormat": "Invalid file format. Please select a .json or .hipacka file.",
-    "projectLoadedSuccessfully": "Project loaded successfully!"
+    "projectLoadedSuccessfully": "Project loaded successfully!",
+    "deleteCardWarning": "Are you sure you want to delete this card? This action cannot be undone."
   }
 }

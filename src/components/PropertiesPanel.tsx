@@ -4,21 +4,22 @@ import { t } from '../i18n';
 
 interface PropertiesPanelProps {
   selectedObject: StackObject | null;
+  onSelectObject: (object: StackObject | null) => void;
   onUpdateObject: (object: StackObject) => void;
-  isRunMode: boolean;
+  onOpenUrl: (url: string) => void;
+  executeScript: (script: string) => void;
   isMagicEnabled: boolean;
-  onDeleteObject: (objectId: string) => void;
-  onUpdateCardDimensions: (cardId: string, width: number, height: number) => void;
+  stack: Stack;
   currentCard: Card | null;
   onDeleteCard: (cardId: string) => void;
-  stack: Stack;
+  onUpdateCardDimensions: (cardId: string, width: number, height: number) => void;
   onUpdateCardName: (cardId: string, newName: string) => void;
 }
 
 // ユーティリティ関数を追加
 const parseUnitValue = (value: string): number => {
-  const parsed = parseFloat(value);
-  return isNaN(parsed) ? 0 : parsed;
+  const num = parseFloat(value);
+  return isNaN(num) ? 0 : num;
 };
 
 const PREDEFINED_CARD_SIZES = [
@@ -31,15 +32,16 @@ const PREDEFINED_CARD_SIZES = [
   { label: 'sizeCustom', width: 0, height: 0 },
 ];
 
-export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({ 
-  selectedObject, 
-  onUpdateObject, 
-  isRunMode, 
-  isMagicEnabled, 
-  onDeleteObject, 
-  onUpdateCardDimensions, 
-  currentCard, 
-  onDeleteCard, 
+export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
+  selectedObject,
+  onSelectObject,
+  onUpdateObject,
+  onOpenUrl,
+  executeScript,
+  isMagicEnabled,
+  currentCard,
+  onDeleteCard,
+  onUpdateCardDimensions,
   stack,
   onUpdateCardName
 }) => {
@@ -49,93 +51,77 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   const [localWidth, setLocalWidth] = useState<string>('');
   const [localHeight, setLocalHeight] = useState<string>('');
   const [localText, setLocalText] = useState<string>('');
-  const [localScript, setLocalScript] = useState<string>('');
-  const [localBorderColor, setLocalBorderColor] = useState<string>('');
-  const [localBorderWidth, setLocalBorderWidth] = useState<BorderWidth>('none');
   const [localTextAlign, setLocalTextAlign] = useState<TextAlign>('left');
-  const [localBackgroundColor, setLocalBackgroundColor] = useState<string>('');
   const [localColor, setLocalColor] = useState<string>('');
+  const [localBackgroundColor, setLocalBackgroundColor] = useState<string>('');
+  const [isTransparentBackground, setIsTransparentBackground] = useState<boolean>(false);
+  const [localBorderWidth, setLocalBorderWidth] = useState<BorderWidth>('none');
+  const [localBorderColor, setLocalBorderColor] = useState<string>('');
   const [localSrc, setLocalSrc] = useState<string>('');
   const [localObjectFit, setLocalObjectFit] = useState<'contain' | 'fill'>('contain');
-  const [isTransparentBackground, setIsTransparentBackground] = useState<boolean>(false);
+  const [localScript, setLocalScript] = useState<string>('');
 
   // Card関連のローカルステート
-  const [localCardName, setLocalCardName] = useState<string>(currentCard?.name || '');
-  const [localCardWidth, setLocalCardWidth] = useState<string>(currentCard?.width ? currentCard.width.toString() : '');
-  const [localCardHeight, setLocalCardHeight] = useState<string>(currentCard?.height ? currentCard.height.toString() : '');
-  const [selectedSizeLabel, setSelectedSizeLabel] = useState<string>('');
+  const [localCardName, setLocalCardName] = useState<string>('');
+  const [localCardWidth, setLocalCardWidth] = useState<string>('');
+  const [localCardHeight, setLocalCardHeight] = useState<string>('');
+  const [selectedSizeLabel, setSelectedSizeLabel] = useState<string>('sizeCustom');
 
+  // オブジェクトプロパティの同期
   useEffect(() => {
     if (selectedObject) {
-      // Object properties initialization
-      setLocalX(selectedObject.x?.toString() || '');
-      setLocalY(selectedObject.y?.toString() || '');
-      setLocalWidth(selectedObject.width?.toString() || '');
-      setLocalHeight(selectedObject.height?.toString() || '');
+      setLocalX(selectedObject.x.toString());
+      setLocalY(selectedObject.y.toString());
+      setLocalWidth(selectedObject.width.toString());
+      setLocalHeight(selectedObject.height.toString());
       setLocalText(selectedObject.text || '');
-      setLocalScript(selectedObject.script || '');
-      setLocalBorderColor(selectedObject.borderColor || '');
-      setLocalBorderWidth(selectedObject.borderWidth || 'none');
       setLocalTextAlign(selectedObject.textAlign || 'left');
       setLocalColor(selectedObject.color || '');
+      setIsTransparentBackground(selectedObject.backgroundColor === 'transparent');
+      setLocalBackgroundColor(selectedObject.backgroundColor === 'transparent' ? '#ffffff' : selectedObject.backgroundColor || '');
+      setLocalBorderWidth(selectedObject.borderWidth || 'none');
+      setLocalBorderColor(selectedObject.borderColor || '');
       setLocalSrc(selectedObject.src || '');
       setLocalObjectFit(selectedObject.objectFit || 'contain');
-
-      // Initialize background color and transparency
-      if (selectedObject.backgroundColor === 'transparent' || selectedObject.backgroundColor === 'rgba(0,0,0,0)') {
-        setIsTransparentBackground(true);
-        setLocalBackgroundColor('#ffffff'); // Default color when transparent is checked
-      } else {
-        setIsTransparentBackground(false);
-        setLocalBackgroundColor(selectedObject.backgroundColor || '');
-      }
+      setLocalScript(selectedObject.script || '');
     } else {
-      // Reset all object states when no object is selected
+      // オブジェクトが選択されていない場合はリセット
       setLocalX('');
       setLocalY('');
       setLocalWidth('');
       setLocalHeight('');
       setLocalText('');
-      setLocalScript('');
-      setLocalBorderColor('');
-      setLocalBorderWidth('none');
       setLocalTextAlign('left');
-      setLocalBackgroundColor('');
       setLocalColor('');
+      setIsTransparentBackground(false);
+      setLocalBackgroundColor('');
+      setLocalBorderWidth('none');
+      setLocalBorderColor('');
       setLocalSrc('');
       setLocalObjectFit('contain');
-      setIsTransparentBackground(false);
+      setLocalScript('');
     }
+  }, [selectedObject]);
 
-    // Initialize card dimensions
+  // カードプロパティの同期
+  useEffect(() => {
     if (currentCard) {
-      setLocalCardName(currentCard.name || '');
+      setLocalCardName(currentCard.name);
       setLocalCardWidth(currentCard.width.toString());
       setLocalCardHeight(currentCard.height.toString());
-      
-      const matchedSize = PREDEFINED_CARD_SIZES.find(
-        size => size.width === currentCard.width && size.height === currentCard.height
-      );
-      setSelectedSizeLabel(matchedSize ? matchedSize.label : 'Custom');
+      const currentSize = PREDEFINED_CARD_SIZES.find(size => size.width === currentCard.width && size.height === currentCard.height);
+      setSelectedSizeLabel(currentSize ? currentSize.label : 'sizeCustom');
     } else {
       setLocalCardName('');
       setLocalCardWidth('');
       setLocalCardHeight('');
-      setSelectedSizeLabel('');
+      setSelectedSizeLabel('sizeCustom');
     }
-  }, [selectedObject, currentCard]);
-
-  // RunModeの場合はパネルを隠す
-  if (isRunMode) {
-    return null;
-  }
+  }, [currentCard]);
 
   const handlePropertyChange = (key: keyof StackObject, value: any) => {
     if (selectedObject) {
-      onUpdateObject({
-        ...selectedObject,
-        [key]: value,
-      });
+      onUpdateObject({ ...selectedObject, [key]: value });
     }
   };
 
@@ -143,38 +129,24 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
     setter(e.target.value);
   };
 
-  const handleNumberInputBlur = (key: keyof StackObject, rawValue: string) => {
-    const pixelValue = parseUnitValue(rawValue);
-    if (!isNaN(pixelValue)) {
-      handlePropertyChange(key, pixelValue);
+  const handleNumberInputBlur = (key: keyof StackObject, localValue: string) => {
+    const numValue = parseUnitValue(localValue);
+    handlePropertyChange(key, numValue);
+  };
+
+  const handleTransparentToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsTransparentBackground(e.target.checked);
+    if (e.target.checked) {
+      handlePropertyChange('backgroundColor', 'transparent');
     } else {
-      // Revert to current object value if parsing fails
-      if (selectedObject) {
-        switch (key) {
-          case 'x': setLocalX(selectedObject.x?.toString() || ''); break;
-          case 'y': setLocalY(selectedObject.y?.toString() || ''); break;
-          case 'width': setLocalWidth(selectedObject.width?.toString() || ''); break;
-          case 'height': setLocalHeight(selectedObject.height?.toString() || ''); break;
-        }
-      }
+      handlePropertyChange('backgroundColor', localBackgroundColor === 'transparent' ? '#ffffff' : localBackgroundColor);
     }
   };
 
   const handleBackgroundColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLocalBackgroundColor(e.target.value);
+    setIsTransparentBackground(false);
     handlePropertyChange('backgroundColor', e.target.value);
-    setIsTransparentBackground(false); // Uncheck transparent if color is picked
-  };
-
-  const handleTransparentToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const isChecked = e.target.checked;
-    setIsTransparentBackground(isChecked);
-    if (isChecked) {
-      handlePropertyChange('backgroundColor', 'transparent');
-    } else {
-      // Revert to last selected color or default if transparent is unchecked
-      handlePropertyChange('backgroundColor', localBackgroundColor || '#ffffff');
-    }
   };
 
   return (
@@ -268,7 +240,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
             onClick={() => {
               if (stack.cards.length > 1) {
                 const confirmed = window.confirm(
-                  'Are you sure you want to delete this card? This action cannot be undone.'
+                  t('deleteCardWarning')
                 );
                 if (confirmed) {
                   onDeleteCard(currentCard.id);
@@ -287,7 +259,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
             }}
             disabled={stack.cards.length <= 1}
           >
-{t('propertiesPanel.deleteCard')}
+            {t('propertiesPanel.deleteCard')}
           </button>
         </div>
       )}
@@ -300,7 +272,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           {/* Position and Size */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
             <div>
-              <label>X:</label>
+              <label>{t('propertiesPanel.positionX')}:</label>
               <input
                 type="number"
                 value={localX}
@@ -310,7 +282,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               />
             </div>
             <div>
-              <label>Y:</label>
+              <label>{t('propertiesPanel.positionY')}:</label>
               <input
                 type="number"
                 value={localY}
@@ -320,7 +292,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               />
             </div>
             <div>
-              <label>Width:</label>
+              <label>{t('propertiesPanel.width')}:</label>
               <input
                 type="number"
                 value={localWidth}
@@ -330,7 +302,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               />
             </div>
             <div>
-              <label>Height:</label>
+              <label>{t('propertiesPanel.height')}:</label>
               <input
                 type="number"
                 value={localHeight}
@@ -568,7 +540,8 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
           <p>{t('propertiesPanel.selectObjectMessage')}</p>
         </div>
       )}
-      
-    </div>
+     </div>
   );
 };
+
+export default PropertiesPanel;
