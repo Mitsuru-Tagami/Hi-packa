@@ -134,7 +134,7 @@ export const initialStack: Stack = {
           id: 'obj-sample-image',
           type: 'image',
           x: 57, y: 550, width: 300, height: 200,
-          text: '',
+          text: '画像のサンプル',
           textAlign: 'left',
           src: 'https://via.placeholder.com/300x200.png?text=Sample+Image',
           objectFit: 'contain',

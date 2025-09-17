@@ -156,7 +156,6 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
       {/* Card Properties Section */}
       {currentCard && (
         <div style={{ marginBottom: '24px', padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}>
-          <h4>{t('propertiesPanel.cardProperties')}</h4>
           
           <div style={{ marginBottom: '12px' }}>
             <label>{t('propertiesPanel.cardName')}:</label>
@@ -269,7 +268,11 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
       {/* Object Properties Section */}
       {selectedObject ? (
         <div style={{ padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}>
-          <h4>{t('propertiesPanel.objectProperties')} ({selectedObject.type})</h4>
+          <h4>{{
+            text: t('text'),
+            image: t('imageName'),
+            button: t('defaultButtonText'),
+          }[selectedObject.type] || selectedObject.type}</h4>
           
           {/* Position and Size */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>

@@ -40,22 +40,30 @@ const CardListPanel: React.FC<CardListPanelProps> = ({
     }
   };
   return (
-    <Box sx={{ borderRight: '1px solid #ddd', height: '100vh', p: 2 }}>
+    <Box sx={{ 
+      borderRight: '1px solid #ddd', 
+      height: '100%', 
+      p: 2, 
+      display: 'flex', 
+      flexDirection: 'column' 
+    }}>
       <Typography variant="h6" gutterBottom>
         {t('cards')}
       </Typography>
-      <List component="nav">
-        {stack.cards.map((card, index) => (
-          <ListItemButton
-            key={card.id}
-            selected={card.id === stack.currentCardId}
-            onClick={() => onSwitchCard(card.id)}
-            disabled={isRunMode}
-          >
-            <ListItemText primary={`${index + 1}. ${card.name}`} />
-          </ListItemButton>
-        ))}
-      </List>
+      <Box sx={{ overflowY: 'auto', flexGrow: 1 }}>
+        <List component="nav">
+          {stack.cards.map((card, index) => (
+            <ListItemButton
+              key={card.id}
+              selected={card.id === stack.currentCardId}
+              onClick={() => onSwitchCard(card.id)}
+              disabled={isRunMode}
+            >
+              <ListItemText primary={`${index + 1}. ${card.name}`} />
+            </ListItemButton>
+          ))}
+        </List>
+      </Box>
       
       {/* Add Card Button - moved here from properties panel */}
       <Box sx={{ mt: 2 }}>
